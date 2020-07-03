@@ -1,0 +1,8 @@
+include LICENSE
+include README.md
+recursive-include cppbktree *.py
+recursive-include cppbktree *.pyx
+recursive-include cppbktree *.c
+recursive-include cppbktree *.h
+recursive-include cppbktree *.cpp
+recursive-include cppbktree *.hpp
