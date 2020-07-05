@@ -859,16 +859,16 @@ static const char *__pyx_f[] = {
 /*--- Type declarations ---*/
 struct __pyx_obj_9cppbktree__BKTree;
 
-/* "cppbktree.pyx":18
- *         vector[size_t] find(const vector[uint8_t]&, unsigned short int) except +
+/* "cppbktree.pyx":41
+ * 
  * 
  * cdef class _BKTree:             # <<<<<<<<<<<<<<
- *     cdef BKTree* tree
+ *     cdef CppBKTree[vector[uint8_t], size_t]* tree
  * 
  */
 struct __pyx_obj_9cppbktree__BKTree {
   PyObject_HEAD
-  BKTree *tree;
+  CppBKTree<std::vector<uint8_t> ,size_t>  *tree;
 };
 
 
@@ -1049,6 +1049,13 @@ static CYTHON_INLINE int __Pyx_PyObject_SetAttrStr(PyObject* obj, PyObject* attr
 #else
 #define __Pyx_PyObject_DelAttrStr(o,n)   PyObject_DelAttr(o,n)
 #define __Pyx_PyObject_SetAttrStr(o,n,v) PyObject_SetAttr(o,n,v)
+#endif
+
+/* PyObjectCallNoArg.proto */
+#if CYTHON_COMPILING_IN_CPYTHON
+static CYTHON_INLINE PyObject* __Pyx_PyObject_CallNoArg(PyObject *func);
+#else
+#define __Pyx_PyObject_CallNoArg(func) __Pyx_PyObject_Call(func, __pyx_empty_tuple, NULL)
 #endif
 
 /* ListCompAppend.proto */
@@ -1328,6 +1335,7 @@ static const char __pyx_k_init[] = "__init__";
 static const char __pyx_k_main[] = "__main__";
 static const char __pyx_k_name[] = "__name__";
 static const char __pyx_k_self[] = "self";
+static const char __pyx_k_size[] = "size";
 static const char __pyx_k_test[] = "__test__";
 static const char __pyx_k_tree[] = "tree";
 static const char __pyx_k_0_0_1[] = "0.0.1";
@@ -1338,43 +1346,64 @@ static const char __pyx_k_module[] = "__module__";
 static const char __pyx_k_reduce[] = "__reduce__";
 static const char __pyx_k_prepare[] = "__prepare__";
 static const char __pyx_k_version[] = "__version__";
+static const char __pyx_k_BKTree_2[] = "BKTree";
 static const char __pyx_k_distance[] = "distance";
 static const char __pyx_k_getstate[] = "__getstate__";
+static const char __pyx_k_maxDepth[] = "maxDepth";
 static const char __pyx_k_qualname[] = "__qualname__";
 static const char __pyx_k_setstate[] = "__setstate__";
-static const char __pyx_k_CppBKTree[] = "CppBKTree";
 static const char __pyx_k_TypeError[] = "TypeError";
 static const char __pyx_k_cppbktree[] = "cppbktree";
+static const char __pyx_k_leafCount[] = "leafCount";
 static const char __pyx_k_metaclass[] = "__metaclass__";
+static const char __pyx_k_nodeCount[] = "nodeCount";
 static const char __pyx_k_reduce_ex[] = "__reduce_ex__";
+static const char __pyx_k_statistics[] = "statistics";
+static const char __pyx_k_valueCount[] = "valueCount";
+static const char __pyx_k_BKTree_find[] = "BKTree.find";
+static const char __pyx_k_BKTree_size[] = "BKTree.size";
+static const char __pyx_k_BKTree___init[] = "BKTree.__init__";
 static const char __pyx_k_reduce_cython[] = "__reduce_cython__";
-static const char __pyx_k_CppBKTree_find[] = "CppBKTree.find";
+static const char __pyx_k_valueBitCount[] = "valueBitCount";
+static const char __pyx_k_duplicateCount[] = "duplicateCount";
 static const char __pyx_k_list_of_hashes[] = "list_of_hashes";
 static const char __pyx_k_setstate_cython[] = "__setstate_cython__";
-static const char __pyx_k_CppBKTree___init[] = "CppBKTree.__init__";
+static const char __pyx_k_BKTree_statistics[] = "BKTree.statistics";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
+static const char __pyx_k_maxChildrenPerNode[] = "maxChildrenPerNode";
+static const char __pyx_k_minChildrenPerNode[] = "minChildrenPerNode";
 static const char __pyx_k_cppbktree_cppbktree_pyx[] = "cppbktree/cppbktree.pyx";
+static const char __pyx_k_averageChildCountPerNode[] = "averageChildCountPerNode";
 static const char __pyx_k_no_default___reduce___due_to_non[] = "no default __reduce__ due to non-trivial __cinit__";
 static PyObject *__pyx_kp_u_0_0_1;
 static PyObject *__pyx_n_s_BKTree;
-static PyObject *__pyx_n_s_CppBKTree;
-static PyObject *__pyx_n_s_CppBKTree___init;
-static PyObject *__pyx_n_s_CppBKTree_find;
+static PyObject *__pyx_n_s_BKTree_2;
+static PyObject *__pyx_n_s_BKTree___init;
+static PyObject *__pyx_n_s_BKTree_find;
+static PyObject *__pyx_n_s_BKTree_size;
+static PyObject *__pyx_n_s_BKTree_statistics;
 static PyObject *__pyx_n_s_TypeError;
+static PyObject *__pyx_n_u_averageChildCountPerNode;
 static PyObject *__pyx_n_s_cline_in_traceback;
 static PyObject *__pyx_n_s_cppbktree;
 static PyObject *__pyx_kp_s_cppbktree_cppbktree_pyx;
 static PyObject *__pyx_n_s_distance;
 static PyObject *__pyx_n_s_doc;
+static PyObject *__pyx_n_u_duplicateCount;
 static PyObject *__pyx_n_s_find;
 static PyObject *__pyx_n_s_getstate;
 static PyObject *__pyx_n_s_init;
+static PyObject *__pyx_n_u_leafCount;
 static PyObject *__pyx_n_s_list_of_hashes;
 static PyObject *__pyx_n_s_main;
+static PyObject *__pyx_n_u_maxChildrenPerNode;
+static PyObject *__pyx_n_u_maxDepth;
 static PyObject *__pyx_n_s_metaclass;
+static PyObject *__pyx_n_u_minChildrenPerNode;
 static PyObject *__pyx_n_s_module;
 static PyObject *__pyx_n_s_name;
 static PyObject *__pyx_kp_s_no_default___reduce___due_to_non;
+static PyObject *__pyx_n_u_nodeCount;
 static PyObject *__pyx_n_s_prepare;
 static PyObject *__pyx_n_s_qualname;
 static PyObject *__pyx_n_s_query;
@@ -1385,16 +1414,24 @@ static PyObject *__pyx_n_s_reduce_ex;
 static PyObject *__pyx_n_s_self;
 static PyObject *__pyx_n_s_setstate;
 static PyObject *__pyx_n_s_setstate_cython;
+static PyObject *__pyx_n_s_size;
+static PyObject *__pyx_n_s_statistics;
 static PyObject *__pyx_n_s_test;
 static PyObject *__pyx_n_s_tree;
+static PyObject *__pyx_n_u_valueBitCount;
+static PyObject *__pyx_n_u_valueCount;
 static PyObject *__pyx_n_s_version;
 static int __pyx_pf_9cppbktree_7_BKTree___cinit__(struct __pyx_obj_9cppbktree__BKTree *__pyx_v_self, PyObject *__pyx_v_list_of_hashes); /* proto */
 static void __pyx_pf_9cppbktree_7_BKTree_2__dealloc__(struct __pyx_obj_9cppbktree__BKTree *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_9cppbktree_7_BKTree_4find(struct __pyx_obj_9cppbktree__BKTree *__pyx_v_self, PyObject *__pyx_v_query, PyObject *__pyx_v_distance); /* proto */
-static PyObject *__pyx_pf_9cppbktree_7_BKTree_6__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_9cppbktree__BKTree *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_9cppbktree_7_BKTree_8__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_9cppbktree__BKTree *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
-static PyObject *__pyx_pf_9cppbktree_9CppBKTree___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_list_of_hashes); /* proto */
-static PyObject *__pyx_pf_9cppbktree_9CppBKTree_2find(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_query, PyObject *__pyx_v_distance); /* proto */
+static PyObject *__pyx_pf_9cppbktree_7_BKTree_6size(struct __pyx_obj_9cppbktree__BKTree *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_9cppbktree_7_BKTree_8statistics(struct __pyx_obj_9cppbktree__BKTree *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_9cppbktree_7_BKTree_10__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_9cppbktree__BKTree *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_9cppbktree_7_BKTree_12__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_9cppbktree__BKTree *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
+static PyObject *__pyx_pf_9cppbktree_6BKTree___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_list_of_hashes); /* proto */
+static PyObject *__pyx_pf_9cppbktree_6BKTree_2find(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_query, PyObject *__pyx_v_distance); /* proto */
+static PyObject *__pyx_pf_9cppbktree_6BKTree_4size(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_9cppbktree_6BKTree_6statistics(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self); /* proto */
 static PyObject *__pyx_tp_new_9cppbktree__BKTree(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_int_0;
 static PyObject *__pyx_tuple_;
@@ -1402,15 +1439,19 @@ static PyObject *__pyx_tuple__2;
 static PyObject *__pyx_tuple__3;
 static PyObject *__pyx_tuple__5;
 static PyObject *__pyx_tuple__7;
+static PyObject *__pyx_tuple__8;
+static PyObject *__pyx_tuple__10;
 static PyObject *__pyx_codeobj__4;
 static PyObject *__pyx_codeobj__6;
+static PyObject *__pyx_codeobj__9;
+static PyObject *__pyx_codeobj__11;
 /* Late includes */
 
-/* "cppbktree.pyx":21
- *     cdef BKTree* tree
+/* "cppbktree.pyx":44
+ *     cdef CppBKTree[vector[uint8_t], size_t]* tree
  * 
  *     def __cinit__(self, list_of_hashes):             # <<<<<<<<<<<<<<
- *         self.tree = new BKTree(<vector[vector[uint8_t]]>list_of_hashes)
+ *         self.tree = new CppBKTree[vector[uint8_t], size_t](<vector[vector[uint8_t]]>list_of_hashes)
  * 
  */
 
@@ -1440,7 +1481,7 @@ static int __pyx_pw_9cppbktree_7_BKTree_1__cinit__(PyObject *__pyx_v_self, PyObj
         else goto __pyx_L5_argtuple_error;
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__cinit__") < 0)) __PYX_ERR(1, 21, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__cinit__") < 0)) __PYX_ERR(1, 44, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 1) {
       goto __pyx_L5_argtuple_error;
@@ -1451,7 +1492,7 @@ static int __pyx_pw_9cppbktree_7_BKTree_1__cinit__(PyObject *__pyx_v_self, PyObj
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 21, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 44, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("cppbktree._BKTree.__cinit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -1468,30 +1509,30 @@ static int __pyx_pf_9cppbktree_7_BKTree___cinit__(struct __pyx_obj_9cppbktree__B
   int __pyx_r;
   __Pyx_RefNannyDeclarations
   std::vector<std::vector<uint8_t> >  __pyx_t_1;
-  BKTree *__pyx_t_2;
+  CppBKTree<std::vector<uint8_t> ,size_t>  *__pyx_t_2;
   __Pyx_RefNannySetupContext("__cinit__", 0);
 
-  /* "cppbktree.pyx":22
+  /* "cppbktree.pyx":45
  * 
  *     def __cinit__(self, list_of_hashes):
- *         self.tree = new BKTree(<vector[vector[uint8_t]]>list_of_hashes)             # <<<<<<<<<<<<<<
+ *         self.tree = new CppBKTree[vector[uint8_t], size_t](<vector[vector[uint8_t]]>list_of_hashes)             # <<<<<<<<<<<<<<
  * 
  *     def __dealloc__(self):
  */
-  __pyx_t_1 = __pyx_convert_vector_from_py_std_3a__3a_vector_3c_uint8_t_3e___(__pyx_v_list_of_hashes); if (unlikely(PyErr_Occurred())) __PYX_ERR(1, 22, __pyx_L1_error)
+  __pyx_t_1 = __pyx_convert_vector_from_py_std_3a__3a_vector_3c_uint8_t_3e___(__pyx_v_list_of_hashes); if (unlikely(PyErr_Occurred())) __PYX_ERR(1, 45, __pyx_L1_error)
   try {
-    __pyx_t_2 = new BKTree(((std::vector<std::vector<uint8_t> > )__pyx_t_1));
+    __pyx_t_2 = new CppBKTree<std::vector<uint8_t> ,size_t> (((std::vector<std::vector<uint8_t> > )__pyx_t_1));
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(1, 22, __pyx_L1_error)
+    __PYX_ERR(1, 45, __pyx_L1_error)
   }
   __pyx_v_self->tree = __pyx_t_2;
 
-  /* "cppbktree.pyx":21
- *     cdef BKTree* tree
+  /* "cppbktree.pyx":44
+ *     cdef CppBKTree[vector[uint8_t], size_t]* tree
  * 
  *     def __cinit__(self, list_of_hashes):             # <<<<<<<<<<<<<<
- *         self.tree = new BKTree(<vector[vector[uint8_t]]>list_of_hashes)
+ *         self.tree = new CppBKTree[vector[uint8_t], size_t](<vector[vector[uint8_t]]>list_of_hashes)
  * 
  */
 
@@ -1506,8 +1547,8 @@ static int __pyx_pf_9cppbktree_7_BKTree___cinit__(struct __pyx_obj_9cppbktree__B
   return __pyx_r;
 }
 
-/* "cppbktree.pyx":24
- *         self.tree = new BKTree(<vector[vector[uint8_t]]>list_of_hashes)
+/* "cppbktree.pyx":47
+ *         self.tree = new CppBKTree[vector[uint8_t], size_t](<vector[vector[uint8_t]]>list_of_hashes)
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
  *         del self.tree
@@ -1529,7 +1570,7 @@ static void __pyx_pf_9cppbktree_7_BKTree_2__dealloc__(struct __pyx_obj_9cppbktre
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__dealloc__", 0);
 
-  /* "cppbktree.pyx":25
+  /* "cppbktree.pyx":48
  * 
  *     def __dealloc__(self):
  *         del self.tree             # <<<<<<<<<<<<<<
@@ -1538,8 +1579,8 @@ static void __pyx_pf_9cppbktree_7_BKTree_2__dealloc__(struct __pyx_obj_9cppbktre
  */
   delete __pyx_v_self->tree;
 
-  /* "cppbktree.pyx":24
- *         self.tree = new BKTree(<vector[vector[uint8_t]]>list_of_hashes)
+  /* "cppbktree.pyx":47
+ *         self.tree = new CppBKTree[vector[uint8_t], size_t](<vector[vector[uint8_t]]>list_of_hashes)
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
  *         del self.tree
@@ -1550,7 +1591,7 @@ static void __pyx_pf_9cppbktree_7_BKTree_2__dealloc__(struct __pyx_obj_9cppbktre
   __Pyx_RefNannyFinishContext();
 }
 
-/* "cppbktree.pyx":27
+/* "cppbktree.pyx":50
  *         del self.tree
  * 
  *     def find(self, query, distance=0):             # <<<<<<<<<<<<<<
@@ -1594,7 +1635,7 @@ static PyObject *__pyx_pw_9cppbktree_7_BKTree_5find(PyObject *__pyx_v_self, PyOb
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "find") < 0)) __PYX_ERR(1, 27, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "find") < 0)) __PYX_ERR(1, 50, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -1610,7 +1651,7 @@ static PyObject *__pyx_pw_9cppbktree_7_BKTree_5find(PyObject *__pyx_v_self, PyOb
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("find", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 27, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("find", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 50, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("cppbktree._BKTree.find", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -1632,31 +1673,31 @@ static PyObject *__pyx_pf_9cppbktree_7_BKTree_4find(struct __pyx_obj_9cppbktree_
   PyObject *__pyx_t_4 = NULL;
   __Pyx_RefNannySetupContext("find", 0);
 
-  /* "cppbktree.pyx":28
+  /* "cppbktree.pyx":51
  * 
  *     def find(self, query, distance=0):
  *         return <list>(self.tree.find(<vector[uint8_t]>query, distance))             # <<<<<<<<<<<<<<
  * 
- * 
+ *     def size(self):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_convert_vector_from_py_uint8_t(__pyx_v_query); if (unlikely(PyErr_Occurred())) __PYX_ERR(1, 28, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyInt_As_unsigned_short(__pyx_v_distance); if (unlikely((__pyx_t_2 == (unsigned short)-1) && PyErr_Occurred())) __PYX_ERR(1, 28, __pyx_L1_error)
+  __pyx_t_1 = __pyx_convert_vector_from_py_uint8_t(__pyx_v_query); if (unlikely(PyErr_Occurred())) __PYX_ERR(1, 51, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_As_unsigned_short(__pyx_v_distance); if (unlikely((__pyx_t_2 == (unsigned short)-1) && PyErr_Occurred())) __PYX_ERR(1, 51, __pyx_L1_error)
   try {
     __pyx_t_3 = __pyx_v_self->tree->find(((std::vector<uint8_t> )__pyx_t_1), __pyx_t_2);
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(1, 28, __pyx_L1_error)
+    __PYX_ERR(1, 51, __pyx_L1_error)
   }
-  __pyx_t_4 = __pyx_convert_vector_to_py_size_t(__pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 28, __pyx_L1_error)
+  __pyx_t_4 = __pyx_convert_vector_to_py_size_t(__pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 51, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (!(likely(PyList_CheckExact(__pyx_t_4))||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "list", Py_TYPE(__pyx_t_4)->tp_name), 0))) __PYX_ERR(1, 28, __pyx_L1_error)
+  if (!(likely(PyList_CheckExact(__pyx_t_4))||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "list", Py_TYPE(__pyx_t_4)->tp_name), 0))) __PYX_ERR(1, 51, __pyx_L1_error)
   __Pyx_INCREF(((PyObject*)__pyx_t_4));
   __pyx_r = __pyx_t_4;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   goto __pyx_L0;
 
-  /* "cppbktree.pyx":27
+  /* "cppbktree.pyx":50
  *         del self.tree
  * 
  *     def find(self, query, distance=0):             # <<<<<<<<<<<<<<
@@ -1675,6 +1716,264 @@ static PyObject *__pyx_pf_9cppbktree_7_BKTree_4find(struct __pyx_obj_9cppbktree_
   return __pyx_r;
 }
 
+/* "cppbktree.pyx":53
+ *         return <list>(self.tree.find(<vector[uint8_t]>query, distance))
+ * 
+ *     def size(self):             # <<<<<<<<<<<<<<
+ *         return self.tree.size()
+ * 
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_9cppbktree_7_BKTree_7size(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_9cppbktree_7_BKTree_7size(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("size (wrapper)", 0);
+  __pyx_r = __pyx_pf_9cppbktree_7_BKTree_6size(((struct __pyx_obj_9cppbktree__BKTree *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_9cppbktree_7_BKTree_6size(struct __pyx_obj_9cppbktree__BKTree *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  size_t __pyx_t_1;
+  PyObject *__pyx_t_2 = NULL;
+  __Pyx_RefNannySetupContext("size", 0);
+
+  /* "cppbktree.pyx":54
+ * 
+ *     def size(self):
+ *         return self.tree.size()             # <<<<<<<<<<<<<<
+ * 
+ *     def statistics(self):
+ */
+  __Pyx_XDECREF(__pyx_r);
+  try {
+    __pyx_t_1 = __pyx_v_self->tree->size();
+  } catch(...) {
+    __Pyx_CppExn2PyErr();
+    __PYX_ERR(1, 54, __pyx_L1_error)
+  }
+  __pyx_t_2 = __Pyx_PyInt_FromSize_t(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 54, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_r = __pyx_t_2;
+  __pyx_t_2 = 0;
+  goto __pyx_L0;
+
+  /* "cppbktree.pyx":53
+ *         return <list>(self.tree.find(<vector[uint8_t]>query, distance))
+ * 
+ *     def size(self):             # <<<<<<<<<<<<<<
+ *         return self.tree.size()
+ * 
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_AddTraceback("cppbktree._BKTree.size", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cppbktree.pyx":56
+ *         return self.tree.size()
+ * 
+ *     def statistics(self):             # <<<<<<<<<<<<<<
+ *         # Automatic POD to dict conversion did not work for me. Maybe because the contained types?
+ *         cdef CppBKTree[vector[uint8_t], size_t].TreeStatistics result = self.tree.statistics();
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_9cppbktree_7_BKTree_9statistics(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_9cppbktree_7_BKTree_9statistics(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("statistics (wrapper)", 0);
+  __pyx_r = __pyx_pf_9cppbktree_7_BKTree_8statistics(((struct __pyx_obj_9cppbktree__BKTree *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_9cppbktree_7_BKTree_8statistics(struct __pyx_obj_9cppbktree__BKTree *__pyx_v_self) {
+  CppBKTree<std::vector<uint8_t> ,size_t> ::TreeStatistics __pyx_v_result;
+  PyObject *__pyx_v_stats = NULL;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  CppBKTree<std::vector<uint8_t> ,size_t> ::TreeStatistics __pyx_t_1;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  __Pyx_RefNannySetupContext("statistics", 0);
+
+  /* "cppbktree.pyx":58
+ *     def statistics(self):
+ *         # Automatic POD to dict conversion did not work for me. Maybe because the contained types?
+ *         cdef CppBKTree[vector[uint8_t], size_t].TreeStatistics result = self.tree.statistics();             # <<<<<<<<<<<<<<
+ *         stats = {
+ *             'nodeCount'                : result.nodeCount               ,
+ */
+  try {
+    __pyx_t_1 = __pyx_v_self->tree->statistics();
+  } catch(...) {
+    __Pyx_CppExn2PyErr();
+    __PYX_ERR(1, 58, __pyx_L1_error)
+  }
+  __pyx_v_result = __pyx_t_1;
+
+  /* "cppbktree.pyx":60
+ *         cdef CppBKTree[vector[uint8_t], size_t].TreeStatistics result = self.tree.statistics();
+ *         stats = {
+ *             'nodeCount'                : result.nodeCount               ,             # <<<<<<<<<<<<<<
+ *             'leafCount'                : result.leafCount               ,
+ *             'valueCount'               : result.valueCount              ,
+ */
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(9); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 60, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyInt_FromSize_t(__pyx_v_result.nodeCount); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 60, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_u_nodeCount, __pyx_t_3) < 0) __PYX_ERR(1, 60, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+  /* "cppbktree.pyx":61
+ *         stats = {
+ *             'nodeCount'                : result.nodeCount               ,
+ *             'leafCount'                : result.leafCount               ,             # <<<<<<<<<<<<<<
+ *             'valueCount'               : result.valueCount              ,
+ *             'averageChildCountPerNode' : result.averageChildCountPerNode,
+ */
+  __pyx_t_3 = __Pyx_PyInt_FromSize_t(__pyx_v_result.leafCount); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 61, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_u_leafCount, __pyx_t_3) < 0) __PYX_ERR(1, 60, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+  /* "cppbktree.pyx":62
+ *             'nodeCount'                : result.nodeCount               ,
+ *             'leafCount'                : result.leafCount               ,
+ *             'valueCount'               : result.valueCount              ,             # <<<<<<<<<<<<<<
+ *             'averageChildCountPerNode' : result.averageChildCountPerNode,
+ *             'maxDepth'                 : result.maxDepth                ,
+ */
+  __pyx_t_3 = __Pyx_PyInt_FromSize_t(__pyx_v_result.valueCount); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 62, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_u_valueCount, __pyx_t_3) < 0) __PYX_ERR(1, 60, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+  /* "cppbktree.pyx":63
+ *             'leafCount'                : result.leafCount               ,
+ *             'valueCount'               : result.valueCount              ,
+ *             'averageChildCountPerNode' : result.averageChildCountPerNode,             # <<<<<<<<<<<<<<
+ *             'maxDepth'                 : result.maxDepth                ,
+ *             'minChildrenPerNode'       : result.minChildrenPerNode      ,
+ */
+  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_result.averageChildCountPerNode); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 63, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_u_averageChildCountPerNode, __pyx_t_3) < 0) __PYX_ERR(1, 60, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+  /* "cppbktree.pyx":64
+ *             'valueCount'               : result.valueCount              ,
+ *             'averageChildCountPerNode' : result.averageChildCountPerNode,
+ *             'maxDepth'                 : result.maxDepth                ,             # <<<<<<<<<<<<<<
+ *             'minChildrenPerNode'       : result.minChildrenPerNode      ,
+ *             'maxChildrenPerNode'       : result.maxChildrenPerNode      ,
+ */
+  __pyx_t_3 = __Pyx_PyInt_FromSize_t(__pyx_v_result.maxDepth); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 64, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_u_maxDepth, __pyx_t_3) < 0) __PYX_ERR(1, 60, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+  /* "cppbktree.pyx":65
+ *             'averageChildCountPerNode' : result.averageChildCountPerNode,
+ *             'maxDepth'                 : result.maxDepth                ,
+ *             'minChildrenPerNode'       : result.minChildrenPerNode      ,             # <<<<<<<<<<<<<<
+ *             'maxChildrenPerNode'       : result.maxChildrenPerNode      ,
+ *             'duplicateCount'           : result.duplicateCount          ,
+ */
+  __pyx_t_3 = __Pyx_PyInt_FromSize_t(__pyx_v_result.minChildrenPerNode); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 65, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_u_minChildrenPerNode, __pyx_t_3) < 0) __PYX_ERR(1, 60, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+  /* "cppbktree.pyx":66
+ *             'maxDepth'                 : result.maxDepth                ,
+ *             'minChildrenPerNode'       : result.minChildrenPerNode      ,
+ *             'maxChildrenPerNode'       : result.maxChildrenPerNode      ,             # <<<<<<<<<<<<<<
+ *             'duplicateCount'           : result.duplicateCount          ,
+ *             'valueBitCount'            : result.valueBitCount           ,
+ */
+  __pyx_t_3 = __Pyx_PyInt_FromSize_t(__pyx_v_result.maxChildrenPerNode); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 66, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_u_maxChildrenPerNode, __pyx_t_3) < 0) __PYX_ERR(1, 60, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+  /* "cppbktree.pyx":67
+ *             'minChildrenPerNode'       : result.minChildrenPerNode      ,
+ *             'maxChildrenPerNode'       : result.maxChildrenPerNode      ,
+ *             'duplicateCount'           : result.duplicateCount          ,             # <<<<<<<<<<<<<<
+ *             'valueBitCount'            : result.valueBitCount           ,
+ *         }
+ */
+  __pyx_t_3 = __Pyx_PyInt_FromSize_t(__pyx_v_result.duplicateCount); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 67, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_u_duplicateCount, __pyx_t_3) < 0) __PYX_ERR(1, 60, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+  /* "cppbktree.pyx":68
+ *             'maxChildrenPerNode'       : result.maxChildrenPerNode      ,
+ *             'duplicateCount'           : result.duplicateCount          ,
+ *             'valueBitCount'            : result.valueBitCount           ,             # <<<<<<<<<<<<<<
+ *         }
+ *         return stats
+ */
+  __pyx_t_3 = __Pyx_PyInt_FromSize_t(__pyx_v_result.valueBitCount); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 68, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_u_valueBitCount, __pyx_t_3) < 0) __PYX_ERR(1, 60, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_v_stats = ((PyObject*)__pyx_t_2);
+  __pyx_t_2 = 0;
+
+  /* "cppbktree.pyx":70
+ *             'valueBitCount'            : result.valueBitCount           ,
+ *         }
+ *         return stats             # <<<<<<<<<<<<<<
+ * 
+ * 
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF(__pyx_v_stats);
+  __pyx_r = __pyx_v_stats;
+  goto __pyx_L0;
+
+  /* "cppbktree.pyx":56
+ *         return self.tree.size()
+ * 
+ *     def statistics(self):             # <<<<<<<<<<<<<<
+ *         # Automatic POD to dict conversion did not work for me. Maybe because the contained types?
+ *         cdef CppBKTree[vector[uint8_t], size_t].TreeStatistics result = self.tree.statistics();
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_AddTraceback("cppbktree._BKTree.statistics", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XDECREF(__pyx_v_stats);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
 /* "(tree fragment)":1
  * def __reduce_cython__(self):             # <<<<<<<<<<<<<<
  *     raise TypeError("no default __reduce__ due to non-trivial __cinit__")
@@ -1682,19 +1981,19 @@ static PyObject *__pyx_pf_9cppbktree_7_BKTree_4find(struct __pyx_obj_9cppbktree_
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_9cppbktree_7_BKTree_7__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyObject *__pyx_pw_9cppbktree_7_BKTree_7__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_9cppbktree_7_BKTree_11__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_9cppbktree_7_BKTree_11__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__reduce_cython__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_9cppbktree_7_BKTree_6__reduce_cython__(((struct __pyx_obj_9cppbktree__BKTree *)__pyx_v_self));
+  __pyx_r = __pyx_pf_9cppbktree_7_BKTree_10__reduce_cython__(((struct __pyx_obj_9cppbktree__BKTree *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_9cppbktree_7_BKTree_6__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_9cppbktree__BKTree *__pyx_v_self) {
+static PyObject *__pyx_pf_9cppbktree_7_BKTree_10__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_9cppbktree__BKTree *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -1736,19 +2035,19 @@ static PyObject *__pyx_pf_9cppbktree_7_BKTree_6__reduce_cython__(CYTHON_UNUSED s
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_9cppbktree_7_BKTree_9__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state); /*proto*/
-static PyObject *__pyx_pw_9cppbktree_7_BKTree_9__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pw_9cppbktree_7_BKTree_13__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state); /*proto*/
+static PyObject *__pyx_pw_9cppbktree_7_BKTree_13__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__setstate_cython__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_9cppbktree_7_BKTree_8__setstate_cython__(((struct __pyx_obj_9cppbktree__BKTree *)__pyx_v_self), ((PyObject *)__pyx_v___pyx_state));
+  __pyx_r = __pyx_pf_9cppbktree_7_BKTree_12__setstate_cython__(((struct __pyx_obj_9cppbktree__BKTree *)__pyx_v_self), ((PyObject *)__pyx_v___pyx_state));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_9cppbktree_7_BKTree_8__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_9cppbktree__BKTree *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pf_9cppbktree_7_BKTree_12__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_9cppbktree__BKTree *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -1782,18 +2081,18 @@ static PyObject *__pyx_pf_9cppbktree_7_BKTree_8__setstate_cython__(CYTHON_UNUSED
   return __pyx_r;
 }
 
-/* "cppbktree.pyx":33
+/* "cppbktree.pyx":75
  * # Extra class because cdefs are not visible from outside
- * class CppBKTree:
+ * class BKTree:
  *     def __init__(self, list_of_hashes):             # <<<<<<<<<<<<<<
  *         self.tree = _BKTree(list_of_hashes)
  * 
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_9cppbktree_9CppBKTree_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_9cppbktree_9CppBKTree_1__init__ = {"__init__", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_9cppbktree_9CppBKTree_1__init__, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_9cppbktree_9CppBKTree_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_9cppbktree_6BKTree_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_9cppbktree_6BKTree_1__init__ = {"__init__", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_9cppbktree_6BKTree_1__init__, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_9cppbktree_6BKTree_1__init__(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_list_of_hashes = 0;
   PyObject *__pyx_r = 0;
@@ -1822,11 +2121,11 @@ static PyObject *__pyx_pw_9cppbktree_9CppBKTree_1__init__(PyObject *__pyx_self, 
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_list_of_hashes)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 2, 2, 1); __PYX_ERR(1, 33, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 2, 2, 1); __PYX_ERR(1, 75, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) __PYX_ERR(1, 33, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) __PYX_ERR(1, 75, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -1839,40 +2138,40 @@ static PyObject *__pyx_pw_9cppbktree_9CppBKTree_1__init__(PyObject *__pyx_self, 
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 33, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__init__", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 75, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("cppbktree.CppBKTree.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("cppbktree.BKTree.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_9cppbktree_9CppBKTree___init__(__pyx_self, __pyx_v_self, __pyx_v_list_of_hashes);
+  __pyx_r = __pyx_pf_9cppbktree_6BKTree___init__(__pyx_self, __pyx_v_self, __pyx_v_list_of_hashes);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_9cppbktree_9CppBKTree___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_list_of_hashes) {
+static PyObject *__pyx_pf_9cppbktree_6BKTree___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_list_of_hashes) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "cppbktree.pyx":34
- * class CppBKTree:
+  /* "cppbktree.pyx":76
+ * class BKTree:
  *     def __init__(self, list_of_hashes):
  *         self.tree = _BKTree(list_of_hashes)             # <<<<<<<<<<<<<<
  * 
  *     def find(self, query, distance=0):
  */
-  __pyx_t_1 = __Pyx_PyObject_CallOneArg(((PyObject *)__pyx_ptype_9cppbktree__BKTree), __pyx_v_list_of_hashes); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 34, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_CallOneArg(((PyObject *)__pyx_ptype_9cppbktree__BKTree), __pyx_v_list_of_hashes); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 76, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_tree, __pyx_t_1) < 0) __PYX_ERR(1, 34, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_tree, __pyx_t_1) < 0) __PYX_ERR(1, 76, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "cppbktree.pyx":33
+  /* "cppbktree.pyx":75
  * # Extra class because cdefs are not visible from outside
- * class CppBKTree:
+ * class BKTree:
  *     def __init__(self, list_of_hashes):             # <<<<<<<<<<<<<<
  *         self.tree = _BKTree(list_of_hashes)
  * 
@@ -1883,7 +2182,7 @@ static PyObject *__pyx_pf_9cppbktree_9CppBKTree___init__(CYTHON_UNUSED PyObject 
   goto __pyx_L0;
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("cppbktree.CppBKTree.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("cppbktree.BKTree.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -1891,7 +2190,7 @@ static PyObject *__pyx_pf_9cppbktree_9CppBKTree___init__(CYTHON_UNUSED PyObject 
   return __pyx_r;
 }
 
-/* "cppbktree.pyx":36
+/* "cppbktree.pyx":78
  *         self.tree = _BKTree(list_of_hashes)
  * 
  *     def find(self, query, distance=0):             # <<<<<<<<<<<<<<
@@ -1900,9 +2199,9 @@ static PyObject *__pyx_pf_9cppbktree_9CppBKTree___init__(CYTHON_UNUSED PyObject 
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_9cppbktree_9CppBKTree_3find(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_9cppbktree_9CppBKTree_3find = {"find", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_9cppbktree_9CppBKTree_3find, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_9cppbktree_9CppBKTree_3find(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_9cppbktree_6BKTree_3find(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_9cppbktree_6BKTree_3find = {"find", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_9cppbktree_6BKTree_3find, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_9cppbktree_6BKTree_3find(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_self = 0;
   PyObject *__pyx_v_query = 0;
   PyObject *__pyx_v_distance = 0;
@@ -1935,7 +2234,7 @@ static PyObject *__pyx_pw_9cppbktree_9CppBKTree_3find(PyObject *__pyx_self, PyOb
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_query)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("find", 0, 2, 3, 1); __PYX_ERR(1, 36, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("find", 0, 2, 3, 1); __PYX_ERR(1, 78, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
@@ -1945,7 +2244,7 @@ static PyObject *__pyx_pw_9cppbktree_9CppBKTree_3find(PyObject *__pyx_self, PyOb
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "find") < 0)) __PYX_ERR(1, 36, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "find") < 0)) __PYX_ERR(1, 78, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -1963,20 +2262,20 @@ static PyObject *__pyx_pw_9cppbktree_9CppBKTree_3find(PyObject *__pyx_self, PyOb
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("find", 0, 2, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 36, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("find", 0, 2, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 78, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("cppbktree.CppBKTree.find", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("cppbktree.BKTree.find", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_9cppbktree_9CppBKTree_2find(__pyx_self, __pyx_v_self, __pyx_v_query, __pyx_v_distance);
+  __pyx_r = __pyx_pf_9cppbktree_6BKTree_2find(__pyx_self, __pyx_v_self, __pyx_v_query, __pyx_v_distance);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_9cppbktree_9CppBKTree_2find(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_query, PyObject *__pyx_v_distance) {
+static PyObject *__pyx_pf_9cppbktree_6BKTree_2find(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self, PyObject *__pyx_v_query, PyObject *__pyx_v_distance) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -1986,17 +2285,17 @@ static PyObject *__pyx_pf_9cppbktree_9CppBKTree_2find(CYTHON_UNUSED PyObject *__
   PyObject *__pyx_t_5 = NULL;
   __Pyx_RefNannySetupContext("find", 0);
 
-  /* "cppbktree.pyx":37
+  /* "cppbktree.pyx":79
  * 
  *     def find(self, query, distance=0):
  *         return self.tree.find(query, distance)             # <<<<<<<<<<<<<<
  * 
- * __version__ = '0.0.1'
+ *     def size(self):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_tree); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 37, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_tree); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 79, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_find); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 37, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_find); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 79, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = NULL;
@@ -2014,7 +2313,7 @@ static PyObject *__pyx_pf_9cppbktree_9CppBKTree_2find(CYTHON_UNUSED PyObject *__
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_3)) {
     PyObject *__pyx_temp[3] = {__pyx_t_2, __pyx_v_query, __pyx_v_distance};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_4, 2+__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 37, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_4, 2+__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 79, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else
@@ -2022,13 +2321,13 @@ static PyObject *__pyx_pf_9cppbktree_9CppBKTree_2find(CYTHON_UNUSED PyObject *__
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
     PyObject *__pyx_temp[3] = {__pyx_t_2, __pyx_v_query, __pyx_v_distance};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_4, 2+__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 37, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_4, 2+__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 79, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else
   #endif
   {
-    __pyx_t_5 = PyTuple_New(2+__pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 37, __pyx_L1_error)
+    __pyx_t_5 = PyTuple_New(2+__pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 79, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     if (__pyx_t_2) {
       __Pyx_GIVEREF(__pyx_t_2); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_2); __pyx_t_2 = NULL;
@@ -2039,7 +2338,7 @@ static PyObject *__pyx_pf_9cppbktree_9CppBKTree_2find(CYTHON_UNUSED PyObject *__
     __Pyx_INCREF(__pyx_v_distance);
     __Pyx_GIVEREF(__pyx_v_distance);
     PyTuple_SET_ITEM(__pyx_t_5, 1+__pyx_t_4, __pyx_v_distance);
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 37, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 79, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   }
@@ -2048,7 +2347,7 @@ static PyObject *__pyx_pf_9cppbktree_9CppBKTree_2find(CYTHON_UNUSED PyObject *__
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "cppbktree.pyx":36
+  /* "cppbktree.pyx":78
  *         self.tree = _BKTree(list_of_hashes)
  * 
  *     def find(self, query, distance=0):             # <<<<<<<<<<<<<<
@@ -2062,7 +2361,173 @@ static PyObject *__pyx_pf_9cppbktree_9CppBKTree_2find(CYTHON_UNUSED PyObject *__
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_AddTraceback("cppbktree.CppBKTree.find", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("cppbktree.BKTree.find", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cppbktree.pyx":81
+ *         return self.tree.find(query, distance)
+ * 
+ *     def size(self):             # <<<<<<<<<<<<<<
+ *         return self.tree.size()
+ * 
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_9cppbktree_6BKTree_5size(PyObject *__pyx_self, PyObject *__pyx_v_self); /*proto*/
+static PyMethodDef __pyx_mdef_9cppbktree_6BKTree_5size = {"size", (PyCFunction)__pyx_pw_9cppbktree_6BKTree_5size, METH_O, 0};
+static PyObject *__pyx_pw_9cppbktree_6BKTree_5size(PyObject *__pyx_self, PyObject *__pyx_v_self) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("size (wrapper)", 0);
+  __pyx_r = __pyx_pf_9cppbktree_6BKTree_4size(__pyx_self, ((PyObject *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_9cppbktree_6BKTree_4size(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  __Pyx_RefNannySetupContext("size", 0);
+
+  /* "cppbktree.pyx":82
+ * 
+ *     def size(self):
+ *         return self.tree.size()             # <<<<<<<<<<<<<<
+ * 
+ *     def statistics(self):
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_tree); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 82, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_size); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 82, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = NULL;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
+    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
+    if (likely(__pyx_t_2)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+      __Pyx_INCREF(__pyx_t_2);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_3, function);
+    }
+  }
+  __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 82, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* "cppbktree.pyx":81
+ *         return self.tree.find(query, distance)
+ * 
+ *     def size(self):             # <<<<<<<<<<<<<<
+ *         return self.tree.size()
+ * 
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_AddTraceback("cppbktree.BKTree.size", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "cppbktree.pyx":84
+ *         return self.tree.size()
+ * 
+ *     def statistics(self):             # <<<<<<<<<<<<<<
+ *         return self.tree.statistics()
+ * 
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_9cppbktree_6BKTree_7statistics(PyObject *__pyx_self, PyObject *__pyx_v_self); /*proto*/
+static PyMethodDef __pyx_mdef_9cppbktree_6BKTree_7statistics = {"statistics", (PyCFunction)__pyx_pw_9cppbktree_6BKTree_7statistics, METH_O, 0};
+static PyObject *__pyx_pw_9cppbktree_6BKTree_7statistics(PyObject *__pyx_self, PyObject *__pyx_v_self) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("statistics (wrapper)", 0);
+  __pyx_r = __pyx_pf_9cppbktree_6BKTree_6statistics(__pyx_self, ((PyObject *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_9cppbktree_6BKTree_6statistics(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  __Pyx_RefNannySetupContext("statistics", 0);
+
+  /* "cppbktree.pyx":85
+ * 
+ *     def statistics(self):
+ *         return self.tree.statistics()             # <<<<<<<<<<<<<<
+ * 
+ * __version__ = '0.0.1'
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_tree); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 85, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_statistics); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 85, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = NULL;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
+    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
+    if (likely(__pyx_t_2)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+      __Pyx_INCREF(__pyx_t_2);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_3, function);
+    }
+  }
+  __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 85, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* "cppbktree.pyx":84
+ *         return self.tree.size()
+ * 
+ *     def statistics(self):             # <<<<<<<<<<<<<<
+ *         return self.tree.statistics()
+ * 
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_AddTraceback("cppbktree.BKTree.statistics", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -2396,8 +2861,10 @@ static void __pyx_tp_dealloc_9cppbktree__BKTree(PyObject *o) {
 
 static PyMethodDef __pyx_methods_9cppbktree__BKTree[] = {
   {"find", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_9cppbktree_7_BKTree_5find, METH_VARARGS|METH_KEYWORDS, 0},
-  {"__reduce_cython__", (PyCFunction)__pyx_pw_9cppbktree_7_BKTree_7__reduce_cython__, METH_NOARGS, 0},
-  {"__setstate_cython__", (PyCFunction)__pyx_pw_9cppbktree_7_BKTree_9__setstate_cython__, METH_O, 0},
+  {"size", (PyCFunction)__pyx_pw_9cppbktree_7_BKTree_7size, METH_NOARGS, 0},
+  {"statistics", (PyCFunction)__pyx_pw_9cppbktree_7_BKTree_9statistics, METH_NOARGS, 0},
+  {"__reduce_cython__", (PyCFunction)__pyx_pw_9cppbktree_7_BKTree_11__reduce_cython__, METH_NOARGS, 0},
+  {"__setstate_cython__", (PyCFunction)__pyx_pw_9cppbktree_7_BKTree_13__setstate_cython__, METH_O, 0},
   {0, 0, 0, 0}
 };
 
@@ -2518,24 +2985,33 @@ static struct PyModuleDef __pyx_moduledef = {
 static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_u_0_0_1, __pyx_k_0_0_1, sizeof(__pyx_k_0_0_1), 0, 1, 0, 0},
   {&__pyx_n_s_BKTree, __pyx_k_BKTree, sizeof(__pyx_k_BKTree), 0, 0, 1, 1},
-  {&__pyx_n_s_CppBKTree, __pyx_k_CppBKTree, sizeof(__pyx_k_CppBKTree), 0, 0, 1, 1},
-  {&__pyx_n_s_CppBKTree___init, __pyx_k_CppBKTree___init, sizeof(__pyx_k_CppBKTree___init), 0, 0, 1, 1},
-  {&__pyx_n_s_CppBKTree_find, __pyx_k_CppBKTree_find, sizeof(__pyx_k_CppBKTree_find), 0, 0, 1, 1},
+  {&__pyx_n_s_BKTree_2, __pyx_k_BKTree_2, sizeof(__pyx_k_BKTree_2), 0, 0, 1, 1},
+  {&__pyx_n_s_BKTree___init, __pyx_k_BKTree___init, sizeof(__pyx_k_BKTree___init), 0, 0, 1, 1},
+  {&__pyx_n_s_BKTree_find, __pyx_k_BKTree_find, sizeof(__pyx_k_BKTree_find), 0, 0, 1, 1},
+  {&__pyx_n_s_BKTree_size, __pyx_k_BKTree_size, sizeof(__pyx_k_BKTree_size), 0, 0, 1, 1},
+  {&__pyx_n_s_BKTree_statistics, __pyx_k_BKTree_statistics, sizeof(__pyx_k_BKTree_statistics), 0, 0, 1, 1},
   {&__pyx_n_s_TypeError, __pyx_k_TypeError, sizeof(__pyx_k_TypeError), 0, 0, 1, 1},
+  {&__pyx_n_u_averageChildCountPerNode, __pyx_k_averageChildCountPerNode, sizeof(__pyx_k_averageChildCountPerNode), 0, 1, 0, 1},
   {&__pyx_n_s_cline_in_traceback, __pyx_k_cline_in_traceback, sizeof(__pyx_k_cline_in_traceback), 0, 0, 1, 1},
   {&__pyx_n_s_cppbktree, __pyx_k_cppbktree, sizeof(__pyx_k_cppbktree), 0, 0, 1, 1},
   {&__pyx_kp_s_cppbktree_cppbktree_pyx, __pyx_k_cppbktree_cppbktree_pyx, sizeof(__pyx_k_cppbktree_cppbktree_pyx), 0, 0, 1, 0},
   {&__pyx_n_s_distance, __pyx_k_distance, sizeof(__pyx_k_distance), 0, 0, 1, 1},
   {&__pyx_n_s_doc, __pyx_k_doc, sizeof(__pyx_k_doc), 0, 0, 1, 1},
+  {&__pyx_n_u_duplicateCount, __pyx_k_duplicateCount, sizeof(__pyx_k_duplicateCount), 0, 1, 0, 1},
   {&__pyx_n_s_find, __pyx_k_find, sizeof(__pyx_k_find), 0, 0, 1, 1},
   {&__pyx_n_s_getstate, __pyx_k_getstate, sizeof(__pyx_k_getstate), 0, 0, 1, 1},
   {&__pyx_n_s_init, __pyx_k_init, sizeof(__pyx_k_init), 0, 0, 1, 1},
+  {&__pyx_n_u_leafCount, __pyx_k_leafCount, sizeof(__pyx_k_leafCount), 0, 1, 0, 1},
   {&__pyx_n_s_list_of_hashes, __pyx_k_list_of_hashes, sizeof(__pyx_k_list_of_hashes), 0, 0, 1, 1},
   {&__pyx_n_s_main, __pyx_k_main, sizeof(__pyx_k_main), 0, 0, 1, 1},
+  {&__pyx_n_u_maxChildrenPerNode, __pyx_k_maxChildrenPerNode, sizeof(__pyx_k_maxChildrenPerNode), 0, 1, 0, 1},
+  {&__pyx_n_u_maxDepth, __pyx_k_maxDepth, sizeof(__pyx_k_maxDepth), 0, 1, 0, 1},
   {&__pyx_n_s_metaclass, __pyx_k_metaclass, sizeof(__pyx_k_metaclass), 0, 0, 1, 1},
+  {&__pyx_n_u_minChildrenPerNode, __pyx_k_minChildrenPerNode, sizeof(__pyx_k_minChildrenPerNode), 0, 1, 0, 1},
   {&__pyx_n_s_module, __pyx_k_module, sizeof(__pyx_k_module), 0, 0, 1, 1},
   {&__pyx_n_s_name, __pyx_k_name, sizeof(__pyx_k_name), 0, 0, 1, 1},
   {&__pyx_kp_s_no_default___reduce___due_to_non, __pyx_k_no_default___reduce___due_to_non, sizeof(__pyx_k_no_default___reduce___due_to_non), 0, 0, 1, 0},
+  {&__pyx_n_u_nodeCount, __pyx_k_nodeCount, sizeof(__pyx_k_nodeCount), 0, 1, 0, 1},
   {&__pyx_n_s_prepare, __pyx_k_prepare, sizeof(__pyx_k_prepare), 0, 0, 1, 1},
   {&__pyx_n_s_qualname, __pyx_k_qualname, sizeof(__pyx_k_qualname), 0, 0, 1, 1},
   {&__pyx_n_s_query, __pyx_k_query, sizeof(__pyx_k_query), 0, 0, 1, 1},
@@ -2546,8 +3022,12 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_self, __pyx_k_self, sizeof(__pyx_k_self), 0, 0, 1, 1},
   {&__pyx_n_s_setstate, __pyx_k_setstate, sizeof(__pyx_k_setstate), 0, 0, 1, 1},
   {&__pyx_n_s_setstate_cython, __pyx_k_setstate_cython, sizeof(__pyx_k_setstate_cython), 0, 0, 1, 1},
+  {&__pyx_n_s_size, __pyx_k_size, sizeof(__pyx_k_size), 0, 0, 1, 1},
+  {&__pyx_n_s_statistics, __pyx_k_statistics, sizeof(__pyx_k_statistics), 0, 0, 1, 1},
   {&__pyx_n_s_test, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
   {&__pyx_n_s_tree, __pyx_k_tree, sizeof(__pyx_k_tree), 0, 0, 1, 1},
+  {&__pyx_n_u_valueBitCount, __pyx_k_valueBitCount, sizeof(__pyx_k_valueBitCount), 0, 1, 0, 1},
+  {&__pyx_n_u_valueCount, __pyx_k_valueCount, sizeof(__pyx_k_valueCount), 0, 1, 0, 1},
   {&__pyx_n_s_version, __pyx_k_version, sizeof(__pyx_k_version), 0, 0, 1, 1},
   {0, 0, 0, 0, 0, 0, 0}
 };
@@ -2582,32 +3062,56 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__2);
   __Pyx_GIVEREF(__pyx_tuple__2);
 
-  /* "cppbktree.pyx":33
+  /* "cppbktree.pyx":75
  * # Extra class because cdefs are not visible from outside
- * class CppBKTree:
+ * class BKTree:
  *     def __init__(self, list_of_hashes):             # <<<<<<<<<<<<<<
  *         self.tree = _BKTree(list_of_hashes)
  * 
  */
-  __pyx_tuple__3 = PyTuple_Pack(2, __pyx_n_s_self, __pyx_n_s_list_of_hashes); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(1, 33, __pyx_L1_error)
+  __pyx_tuple__3 = PyTuple_Pack(2, __pyx_n_s_self, __pyx_n_s_list_of_hashes); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(1, 75, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__3);
   __Pyx_GIVEREF(__pyx_tuple__3);
-  __pyx_codeobj__4 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__3, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_cppbktree_cppbktree_pyx, __pyx_n_s_init, 33, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__4)) __PYX_ERR(1, 33, __pyx_L1_error)
+  __pyx_codeobj__4 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__3, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_cppbktree_cppbktree_pyx, __pyx_n_s_init, 75, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__4)) __PYX_ERR(1, 75, __pyx_L1_error)
 
-  /* "cppbktree.pyx":36
+  /* "cppbktree.pyx":78
  *         self.tree = _BKTree(list_of_hashes)
  * 
  *     def find(self, query, distance=0):             # <<<<<<<<<<<<<<
  *         return self.tree.find(query, distance)
  * 
  */
-  __pyx_tuple__5 = PyTuple_Pack(3, __pyx_n_s_self, __pyx_n_s_query, __pyx_n_s_distance); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(1, 36, __pyx_L1_error)
+  __pyx_tuple__5 = PyTuple_Pack(3, __pyx_n_s_self, __pyx_n_s_query, __pyx_n_s_distance); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(1, 78, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__5);
   __Pyx_GIVEREF(__pyx_tuple__5);
-  __pyx_codeobj__6 = (PyObject*)__Pyx_PyCode_New(3, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__5, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_cppbktree_cppbktree_pyx, __pyx_n_s_find, 36, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__6)) __PYX_ERR(1, 36, __pyx_L1_error)
-  __pyx_tuple__7 = PyTuple_Pack(1, ((PyObject *)__pyx_int_0)); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(1, 36, __pyx_L1_error)
+  __pyx_codeobj__6 = (PyObject*)__Pyx_PyCode_New(3, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__5, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_cppbktree_cppbktree_pyx, __pyx_n_s_find, 78, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__6)) __PYX_ERR(1, 78, __pyx_L1_error)
+  __pyx_tuple__7 = PyTuple_Pack(1, ((PyObject *)__pyx_int_0)); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(1, 78, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__7);
   __Pyx_GIVEREF(__pyx_tuple__7);
+
+  /* "cppbktree.pyx":81
+ *         return self.tree.find(query, distance)
+ * 
+ *     def size(self):             # <<<<<<<<<<<<<<
+ *         return self.tree.size()
+ * 
+ */
+  __pyx_tuple__8 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(1, 81, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__8);
+  __Pyx_GIVEREF(__pyx_tuple__8);
+  __pyx_codeobj__9 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__8, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_cppbktree_cppbktree_pyx, __pyx_n_s_size, 81, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__9)) __PYX_ERR(1, 81, __pyx_L1_error)
+
+  /* "cppbktree.pyx":84
+ *         return self.tree.size()
+ * 
+ *     def statistics(self):             # <<<<<<<<<<<<<<
+ *         return self.tree.statistics()
+ * 
+ */
+  __pyx_tuple__10 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(1, 84, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__10);
+  __Pyx_GIVEREF(__pyx_tuple__10);
+  __pyx_codeobj__11 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__10, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_cppbktree_cppbktree_pyx, __pyx_n_s_statistics, 84, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__11)) __PYX_ERR(1, 84, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -2659,15 +3163,15 @@ static int __Pyx_modinit_type_init_code(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_modinit_type_init_code", 0);
   /*--- Type init code ---*/
-  if (PyType_Ready(&__pyx_type_9cppbktree__BKTree) < 0) __PYX_ERR(1, 18, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_9cppbktree__BKTree) < 0) __PYX_ERR(1, 41, __pyx_L1_error)
   #if PY_VERSION_HEX < 0x030800B1
   __pyx_type_9cppbktree__BKTree.tp_print = 0;
   #endif
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_type_9cppbktree__BKTree.tp_dictoffset && __pyx_type_9cppbktree__BKTree.tp_getattro == PyObject_GenericGetAttr)) {
     __pyx_type_9cppbktree__BKTree.tp_getattro = __Pyx_PyObject_GenericGetAttr;
   }
-  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_BKTree, (PyObject *)&__pyx_type_9cppbktree__BKTree) < 0) __PYX_ERR(1, 18, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_9cppbktree__BKTree) < 0) __PYX_ERR(1, 18, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_BKTree, (PyObject *)&__pyx_type_9cppbktree__BKTree) < 0) __PYX_ERR(1, 41, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_9cppbktree__BKTree) < 0) __PYX_ERR(1, 41, __pyx_L1_error)
   __pyx_ptype_9cppbktree__BKTree = &__pyx_type_9cppbktree__BKTree;
   __Pyx_RefNannyFinishContext();
   return 0;
@@ -2898,60 +3402,84 @@ if (!__Pyx_RefNanny) {
   if (__Pyx_patch_abc() < 0) __PYX_ERR(1, 1, __pyx_L1_error)
   #endif
 
-  /* "cppbktree.pyx":32
+  /* "cppbktree.pyx":74
  * 
  * # Extra class because cdefs are not visible from outside
- * class CppBKTree:             # <<<<<<<<<<<<<<
+ * class BKTree:             # <<<<<<<<<<<<<<
  *     def __init__(self, list_of_hashes):
  *         self.tree = _BKTree(list_of_hashes)
  */
-  __pyx_t_1 = __Pyx_Py3MetaclassPrepare((PyObject *) NULL, __pyx_empty_tuple, __pyx_n_s_CppBKTree, __pyx_n_s_CppBKTree, (PyObject *) NULL, __pyx_n_s_cppbktree, (PyObject *) NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 32, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_Py3MetaclassPrepare((PyObject *) NULL, __pyx_empty_tuple, __pyx_n_s_BKTree_2, __pyx_n_s_BKTree_2, (PyObject *) NULL, __pyx_n_s_cppbktree, (PyObject *) NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 74, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
 
-  /* "cppbktree.pyx":33
+  /* "cppbktree.pyx":75
  * # Extra class because cdefs are not visible from outside
- * class CppBKTree:
+ * class BKTree:
  *     def __init__(self, list_of_hashes):             # <<<<<<<<<<<<<<
  *         self.tree = _BKTree(list_of_hashes)
  * 
  */
-  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_9cppbktree_9CppBKTree_1__init__, 0, __pyx_n_s_CppBKTree___init, NULL, __pyx_n_s_cppbktree, __pyx_d, ((PyObject *)__pyx_codeobj__4)); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 33, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_9cppbktree_6BKTree_1__init__, 0, __pyx_n_s_BKTree___init, NULL, __pyx_n_s_cppbktree, __pyx_d, ((PyObject *)__pyx_codeobj__4)); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 75, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_init, __pyx_t_2) < 0) __PYX_ERR(1, 33, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_init, __pyx_t_2) < 0) __PYX_ERR(1, 75, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "cppbktree.pyx":36
+  /* "cppbktree.pyx":78
  *         self.tree = _BKTree(list_of_hashes)
  * 
  *     def find(self, query, distance=0):             # <<<<<<<<<<<<<<
  *         return self.tree.find(query, distance)
  * 
  */
-  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_9cppbktree_9CppBKTree_3find, 0, __pyx_n_s_CppBKTree_find, NULL, __pyx_n_s_cppbktree, __pyx_d, ((PyObject *)__pyx_codeobj__6)); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 36, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_9cppbktree_6BKTree_3find, 0, __pyx_n_s_BKTree_find, NULL, __pyx_n_s_cppbktree, __pyx_d, ((PyObject *)__pyx_codeobj__6)); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 78, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_2, __pyx_tuple__7);
-  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_find, __pyx_t_2) < 0) __PYX_ERR(1, 36, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_find, __pyx_t_2) < 0) __PYX_ERR(1, 78, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "cppbktree.pyx":32
+  /* "cppbktree.pyx":81
+ *         return self.tree.find(query, distance)
+ * 
+ *     def size(self):             # <<<<<<<<<<<<<<
+ *         return self.tree.size()
+ * 
+ */
+  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_9cppbktree_6BKTree_5size, 0, __pyx_n_s_BKTree_size, NULL, __pyx_n_s_cppbktree, __pyx_d, ((PyObject *)__pyx_codeobj__9)); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 81, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_size, __pyx_t_2) < 0) __PYX_ERR(1, 81, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "cppbktree.pyx":84
+ *         return self.tree.size()
+ * 
+ *     def statistics(self):             # <<<<<<<<<<<<<<
+ *         return self.tree.statistics()
+ * 
+ */
+  __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_9cppbktree_6BKTree_7statistics, 0, __pyx_n_s_BKTree_statistics, NULL, __pyx_n_s_cppbktree, __pyx_d, ((PyObject *)__pyx_codeobj__11)); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 84, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (__Pyx_SetNameInClass(__pyx_t_1, __pyx_n_s_statistics, __pyx_t_2) < 0) __PYX_ERR(1, 84, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "cppbktree.pyx":74
  * 
  * # Extra class because cdefs are not visible from outside
- * class CppBKTree:             # <<<<<<<<<<<<<<
+ * class BKTree:             # <<<<<<<<<<<<<<
  *     def __init__(self, list_of_hashes):
  *         self.tree = _BKTree(list_of_hashes)
  */
-  __pyx_t_2 = __Pyx_Py3ClassCreate(((PyObject*)&__Pyx_DefaultClassType), __pyx_n_s_CppBKTree, __pyx_empty_tuple, __pyx_t_1, NULL, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 32, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_Py3ClassCreate(((PyObject*)&__Pyx_DefaultClassType), __pyx_n_s_BKTree_2, __pyx_empty_tuple, __pyx_t_1, NULL, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 74, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_CppBKTree, __pyx_t_2) < 0) __PYX_ERR(1, 32, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_BKTree_2, __pyx_t_2) < 0) __PYX_ERR(1, 74, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "cppbktree.pyx":39
- *         return self.tree.find(query, distance)
+  /* "cppbktree.pyx":87
+ *         return self.tree.statistics()
  * 
  * __version__ = '0.0.1'             # <<<<<<<<<<<<<<
  */
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_version, __pyx_kp_u_0_0_1) < 0) __PYX_ERR(1, 39, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_version, __pyx_kp_u_0_0_1) < 0) __PYX_ERR(1, 87, __pyx_L1_error)
 
   /* "cppbktree.pyx":1
  * from libc.stdlib cimport malloc, free             # <<<<<<<<<<<<<<
@@ -3600,6 +4128,28 @@ static CYTHON_INLINE int __Pyx_PyObject_SetAttrStr(PyObject* obj, PyObject* attr
         return tp->tp_setattr(obj, PyString_AS_STRING(attr_name), value);
 #endif
     return PyObject_SetAttr(obj, attr_name, value);
+}
+#endif
+
+/* PyObjectCallNoArg */
+#if CYTHON_COMPILING_IN_CPYTHON
+static CYTHON_INLINE PyObject* __Pyx_PyObject_CallNoArg(PyObject *func) {
+#if CYTHON_FAST_PYCALL
+    if (PyFunction_Check(func)) {
+        return __Pyx_PyFunction_FastCall(func, NULL, 0);
+    }
+#endif
+#ifdef __Pyx_CyFunction_USED
+    if (likely(PyCFunction_Check(func) || __Pyx_CyFunction_Check(func)))
+#else
+    if (likely(PyCFunction_Check(func)))
+#endif
+    {
+        if (likely(PyCFunction_GET_FLAGS(func) & METH_NOARGS)) {
+            return __Pyx_PyObject_CallMethO(func, NULL);
+        }
+    }
+    return __Pyx_PyObject_Call(func, __pyx_empty_tuple, NULL);
 }
 #endif
 
