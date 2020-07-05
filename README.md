@@ -35,7 +35,7 @@ This is done five times to get a hint for the standard deviation as is plotted w
 
 ## Comparison pybktree vs. cppbktree
 
-![Comparison pybktree cppbktree](results/compare-scalings-pybktree-cppbktree.png)
+![Comparison pybktree cppbktree](benchmark/results/compare-scalings-pybktree-cppbktree.png)
 
 In this log-log plot, it can be seen that the lookups and creations follow various sublinear power laws.
 Inserting one element in a tree of depth $d$ should roughly take `O(log(d))` hamming distance evaluations.
@@ -83,6 +83,9 @@ Only the tree creation time speedup is quite independent of the tree size at rou
 
 
 ## Comparison pybktree vs. vptree
+
+
+![Comparison pybktree cppbktree](benchmark/results/compare-scalings-pybktree-vptree.png)
 
 At least in this benchmark with only 64-bit hashes and a hamming distance as metric and at least with this pure python implementation of a VP-Tree, the results are quite disappointing.
 The vptree module is almost always slower.
