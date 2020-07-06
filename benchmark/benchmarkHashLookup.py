@@ -166,10 +166,14 @@ def plot_results_to_axis( ax, timings, linestyle = '-', plot_fits = True ):
 
     custom_lines = []
 
+    # Note that absolut +- errors become relative erros when log-scaled by using Gaussian error propagation
+    relErrors = creation_times_std / creation_times_mean
     color = 'k'
     custom_lines.append( Line2D( [0], [0], color = color, marker = '+', label = "Tree creation" ) )
-    ax.errorbar( element_counts, creation_times_mean, creation_times_std,
-                 marker = '+', linestyle = linestyle, color = color, label = "Tree creation" )
+    ax.errorbar( element_counts, creation_times_mean,
+                 [ creation_times_mean - creation_times_mean / ( 1 + relErrors ),
+                   creation_times_mean * ( 1 + relErrors ) - creation_times_mean ],
+                 marker = '+', linestyle = linestyle, color = color, capsize = 2, label = "Tree creation" )
     a,b = fit_power_law( element_counts, creation_times_mean )
     if plot_fits:
         ax.plot( element_counts, a * element_counts**b, color = '0.5', linestyle = '--' )
@@ -182,12 +186,15 @@ def plot_results_to_axis( ax, timings, linestyle = '-', plot_fits = True ):
 
         assert np.all( lookup_distances == lookup_distances[0] )
 
+        relErrors = lookup_times_std / lookup_times_mean
         color = next( colors )
         label = "Lookup distance <= {}".format( lookup_distances[0] )
         custom_lines.append( Line2D( [0], [0], color = color, marker = '.', label = label ) )
-        ax.errorbar( element_counts, lookup_times_mean, lookup_times_std,
+        ax.errorbar( element_counts, lookup_times_mean,
+                     [ lookup_times_mean - lookup_times_mean / ( 1 + relErrors ),
+                       lookup_times_mean * ( 1 + relErrors ) - lookup_times_mean ],
                      marker = '.', linestyle = linestyle, color = color,
-                     label = label )
+                     label = label, capsize = 2 )
         a,b = fit_power_law( element_counts, lookup_times_mean )
         if plot_fits:
             ax.plot( element_counts, a * element_counts**b, color = '0.5', linestyle = '--' )
@@ -278,6 +285,9 @@ if __name__ == '__main__':
         plot_results( np.genfromtxt( 'results/cppbktree-scaling.dat' ), export_name = 'results/cppbktree-scaling' )
 
     #compare_scaling( [ 'results/pybktree-scaling.dat', 'results/cppbktree-scaling.dat' ], 'results/compare-scalings' )
-    compare_scaling( [ 'results/pybktree-scaling-1e5.dat', 'results/vptree-scaling-1e5.dat' ], 'results/compare-scalings' )
+    compare_scaling( [ 'results/pybktree-scaling-1e7.dat', 'results/cppbktree-scaling-1e7.dat' ],
+                     'results/compare-scalings-pybktree-cppbktree' )
+    compare_scaling( [ 'results/pybktree-scaling-1e5.dat', 'results/vptree-scaling-1e5.dat' ],
+                     'results/compare-scalings-pybktree-vptree' )
 
     plt.show()
