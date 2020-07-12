@@ -1,5 +1,5 @@
 CPP=g++
-CFLAGS=-I ../cppbktree -std=c++11 -Wall -Wextra -Wshadow -Wsuggest-override -O3 -DNDEBUG
+CFLAGS=-I ../cppbktree -std=c++11 -Wall -Wextra -Wshadow -Wsuggest-override -O3 -g -DNDEBUG
 
 all: testcppbktree check
 

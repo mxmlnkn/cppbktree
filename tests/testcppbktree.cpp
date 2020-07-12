@@ -5,6 +5,8 @@
 #include <iostream>
 #include <limits>
 #include <numeric>
+#include <random>
+#include <sstream>
 #include <vector>
 
 #include <cppbktree.hpp>
@@ -19,6 +21,34 @@ if ( !( (x) == (y) ) ) { \
 
 using BKTree = CppBKTree<std::vector<std::uint8_t>, size_t>;
 using Values = std::vector<std::vector<std::uint8_t> >;
+
+
+std::mt19937 prng( 123456 );
+
+
+std::vector<uint8_t>
+createRandomVector( size_t size )
+{
+    std::uniform_int_distribution<uint8_t> uniformUInt8( 0 );
+
+    std::vector<uint8_t> result( size );
+    for ( auto& x : result ) {
+        x = uniformUInt8( prng );
+    }
+    return result;
+}
+
+
+std::vector<std::vector<uint8_t> >
+createRandomVectorVector( size_t vectorCount,
+                          size_t vectorSize )
+{
+    std::vector<std::vector<uint8_t> > result( vectorCount );
+    for ( auto& x : result ) {
+        x = createRandomVector( vectorSize );
+    }
+    return result;
+}
 
 
 void
@@ -133,6 +163,34 @@ checkBKTree()
     }
 
     /* Do some generic tests by comparing BKTree find with the results of a linear search. */
+
+    /* Check saving and loading */
+    const Values samples = { { 5 }, { 7 }, { 6 }, { 0 }, { 13 }, { 3 }, { 9 }, { 10 } };
+    for ( size_t i = 0; i < samples.size(); ++i ) {
+        auto subsamples = samples;
+        subsamples.resize( i );
+        std::stringstream buffer;
+
+        BKTree tree( hammingDistance, subsamples );
+        tree.serialize( buffer );
+
+        BKTree loadedTree( hammingDistance );
+        loadedTree.deserialize( buffer );
+
+        CHECK( tree, loadedTree );
+    }
+
+    {
+        std::stringstream buffer;
+
+        BKTree tree( hammingDistance, createRandomVectorVector( 256, 2 ) );
+        tree.serialize( buffer );
+
+        BKTree loadedTree( hammingDistance );
+        loadedTree.deserialize( buffer );
+
+        CHECK( tree, loadedTree );
+    }
 }
 
 

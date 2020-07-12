@@ -13,6 +13,7 @@
 #include <memory>
 #include <stack>
 #include <stdexcept>
+#include <tuple>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -81,6 +82,69 @@ operator<<( std::ostream&         out,
     out << " }";
     return out;
 }
+
+
+template<typename T>
+void
+serializeVector( std::ostream&         out,
+                 const std::vector<T>& value )
+{
+    const uint64_t size = value.size();
+    out.write( reinterpret_cast<const char*>( &size ), sizeof( size ) );
+    out.write( reinterpret_cast<const char*>( value.data() ), value.size() * sizeof( value[0] ) );
+}
+
+
+/**
+ * @return true if reading was successful
+ */
+template<typename T>
+bool
+deserializeVector( std::istream&   in,
+                   std::vector<T>* value )
+{
+    if ( value == nullptr ) {
+        throw std::invalid_argument( "Result location may not be nullptr!" );
+    }
+
+    uint64_t size = 0;
+    in.read( reinterpret_cast<char*>( &size ), sizeof( size ) );
+    if ( !in.good() ) {
+        return false;
+    }
+
+    value->resize( size );
+    in.read( reinterpret_cast<char*>( value->data() ), value->size() * sizeof( value->front() ) );
+    return in.good();
+}
+
+
+template<typename T,
+         typename std::enable_if<std::is_integral<T>::value, int>::type = 0>
+void
+serialize( std::ostream& out,
+           T             value )
+{
+    out.write( reinterpret_cast<const char*>( &value ), sizeof( value ) );
+}
+
+
+template<typename T,
+         typename std::enable_if<std::is_integral<T>::value, int>::type = 0>
+bool
+deserialize( std::istream& in,
+             T*            value )
+{
+    if ( value == nullptr ) {
+        throw std::invalid_argument( "Result location may not be nullptr!" );
+    }
+    in.read( reinterpret_cast<char*>( value ), sizeof( *value ) );
+    return in.good();
+}
+
+
+static const std::string DATA_MAGIC_BYTES = "CPPBKTREE";
+static constexpr uint8_t DATA_VERSION = 0;
 }
 
 
@@ -106,7 +170,132 @@ public:
          * If there are multiple values identical under the metric, then there might be more than one payload.
          */
         std::vector<size_t> payloads;
-        std::map<DistanceType, std::unique_ptr<Node>> children;
+        std::map<DistanceType, std::unique_ptr<Node> > children;
+
+    public:
+        void
+        serialize( std::ostream& out,
+                   uint32_t      depth ) const
+        {
+            serializeVector( out, value );
+            serializeVector( out, payloads );
+
+            for ( const auto& child : children ) {
+                ::serialize( out, depth );
+                ::serialize( out, child.first );
+                child.second->serialize( out, depth + 1 );
+            }
+        }
+
+        /**
+         * @return number of successfully deserialized entries.
+         */
+        size_t
+        deserialize( std::istream& in,
+                     uint32_t      depth )
+        {
+            static_assert( std::is_same<ValueType, std::vector<uint8_t> >::value,
+                           "Not yet working for generic value types!" );
+            deserializeVector( in, &value );
+            deserializeVector( in, &payloads );
+
+            /* File is not good if EOF is reached. EOF is only reached when trying to read bytes after it.
+             * Reading the very last byte in the file successfully, will not set the EOF flag yet!
+             * So, if it is set, then deserializing one of the above contents already failed. */
+            if ( !in.good() ) {
+                return 0;
+            }
+            size_t deserializedPayloadsCount = payloads.size();
+
+            while ( in.good() ) {
+                /* Peek at the depth of the next entry. Return if it isn't for us. */
+                const auto oldPos = in.tellg();
+                uint32_t entryDepth = 0;
+                ::deserialize( in, &entryDepth );
+
+                if ( !in.good() ) {
+                    /* Simply no more entries to read but the current node was deserialized successfully. */
+                    return deserializedPayloadsCount;
+                }
+
+                if ( entryDepth < depth ) {
+                    /* Rewind, so that the responsible parent can reread and check the depth. */
+                    in.seekg( oldPos );
+                    return deserializedPayloadsCount;
+                }
+
+                if ( entryDepth > depth + 1 ) {
+                    throw std::invalid_argument( "Data file seems to have skipped some tree levels when descending!" );
+                }
+
+                /* Entry belongs to us, so deserialize it */
+                DistanceType distance;
+                ::deserialize( in, &distance );
+                if ( !in.good() ) {
+                    throw std::invalid_argument( "Valid depth found but not followed by distance value. "
+                                                 "Incomplete data file?" );
+                }
+
+                auto node = std::unique_ptr<Node>( new Node() );
+                const auto deserializedChildrenCount = node->deserialize( in, depth + 1 );
+                if ( deserializedChildrenCount > 0 ) {
+                    children.emplace( distance, std::move( node ) );
+                    deserializedPayloadsCount += deserializedChildrenCount;
+                }
+            }
+
+            return deserializedPayloadsCount;
+        }
+
+        bool
+        operator==( const Node& other ) const
+        {
+            if ( ( value           != other.value           ) ||
+                 ( payloads        != other.payloads        ) ||
+                 ( children.size() != other.children.size() ) )
+            {
+                return false;
+            }
+
+            using ChildKeyValue = decltype( *children.begin() );
+
+            const auto childrenAreEqual =
+                [] ( const ChildKeyValue& child1, const ChildKeyValue& child2 )
+                {
+                    if ( ( child1.first != child2.first ) ||
+                         ( static_cast<bool>( child1.second ) != static_cast<bool>( child2.second ) ) )
+                    {
+                        return false;
+                    }
+
+                    if ( child1.second && child2.second ) {
+                        return *child1.second == *child2.second;
+                    }
+
+                    return true;
+                };
+
+            return std::equal( children.begin(), children.end(), other.children.begin(), childrenAreEqual );
+        }
+
+
+        void
+        print( std::ostream&    out,
+               uint32_t         depth = 0 ) const
+        {
+            std::ios ioState( nullptr );
+            ioState.copyfmt( out );
+
+            out << "Value: " << value << ", Payloads: " << payloads << std::endl;
+
+            for ( const auto& child : children ) {
+                out << std::setw( ( depth + 1 ) * 2 ) << std::setfill( ' ' ) << ""
+                    << std::setw( 8 ) << child.first;
+                out.copyfmt( ioState );
+                out << " : ";
+                child.second->print( out, depth + 1 );
+            }
+        }
     };
 
     struct TreeStatistics
@@ -316,6 +505,73 @@ public:
                                           / ( result.nodeCount - result.leafCount );
 
         return result;
+    }
+
+    void
+    serialize( std::ostream& out ) const
+    {
+        out.write( reinterpret_cast<const char*>( DATA_MAGIC_BYTES.data() ),
+                   DATA_MAGIC_BYTES.size() * sizeof( DATA_MAGIC_BYTES.front() ) );
+        out.write( reinterpret_cast<const char*>( &DATA_VERSION ), sizeof( DATA_VERSION ) );
+
+        if ( m_root ) {
+            m_root->serialize( out, 0 );
+        }
+    }
+
+    void
+    deserialize( std::istream& in )
+    {
+        std::string buffer( DATA_MAGIC_BYTES.size(), '\0' );
+        in.read( reinterpret_cast<char*>( &buffer[0] ), buffer.size() * sizeof( buffer.front() ) );
+        if ( ( buffer != DATA_MAGIC_BYTES ) || !in.good() ) {
+            throw std::invalid_argument( "Could not verify magic bytes for given file!" );
+        }
+
+        uint8_t version = DATA_VERSION + 1; // use a different initial value from what it should be to detect errors!
+        in.read( reinterpret_cast<char*>( &version ), sizeof( version ) );
+        if ( version != DATA_VERSION ) {
+            throw std::invalid_argument( "Mismatching data file version for given file!" );
+        }
+
+        if ( in.good() ) {
+            m_root = std::unique_ptr<Node>( new Node() );
+            m_itemCount = m_root->deserialize( in, 0 );
+            if ( m_itemCount == 0 ) {
+                m_root.release();
+            }
+        }
+    }
+
+    bool
+    operator==( const CppBKTree& other ) const
+    {
+        if ( ( static_cast<bool>( m_root ) != static_cast<bool>( other.m_root ) ) ||
+             ( m_itemCount != other.m_itemCount ) )
+        {
+             return false;
+        }
+
+        if ( m_root && other.m_root ) {
+            return *m_root == *other.m_root;
+        }
+
+        return true;
+
+    }
+
+    friend std::ostream&
+    operator<<( std::ostream&    out,
+                const CppBKTree& tree )
+    {
+        out << "Tree with " << tree.m_itemCount << " items:\n";
+        if ( tree.m_root ) {
+            tree.m_root->print( out, 1 );
+        } else {
+            out << "<empty tree>";
+        }
+        out << std::endl;
+        return out;
     }
 
 private:
