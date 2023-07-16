@@ -4,6 +4,7 @@
 #include <bitset>
 #include <cassert>
 #include <cstdint>
+#include <fstream>
 #include <functional>
 #include <iomanip>
 #include <iostream>
@@ -346,6 +347,14 @@ public:
         }
     }
 
+    explicit
+    CppBKTree( const std::string& fileName ) :
+        m_metricFunction( &hammingDistance )
+    {
+        std::ifstream inputFile( fileName );
+        deserialize( inputFile );
+    }
+
     void
     add( const ValueType& value )
     {
@@ -505,6 +514,13 @@ public:
                                           / ( result.nodeCount - result.leafCount );
 
         return result;
+    }
+
+    void
+    serialize( const std::string& fileName ) const
+    {
+        std::ofstream outputFile( fileName );
+        serialize( outputFile );
     }
 
     void
