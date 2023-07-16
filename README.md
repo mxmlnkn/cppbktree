@@ -15,6 +15,14 @@ You can simply install it from PyPI:
 pip install cppbktree
 ```
 
+## From Source
+
+```python3
+python3 -m build . &&
+python3 -m pip install dist/cppbktree-*.whl
+```
+
+
 # Usage
 
 ```python3

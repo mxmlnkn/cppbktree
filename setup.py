@@ -1,51 +1,119 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
-import sys
+import platform
+import tempfile
+from distutils.errors import CompileError
+
 from setuptools import setup
 from setuptools.extension import Extension
+from setuptools.command.build_ext import build_ext
 
-buildCython = '--cython' in sys.argv
+# This fallback is only for jinja, which is used by conda to analyze this setup.py before any build environment
+# is set up.
+try:
+    from Cython.Build import cythonize
+except ImportError:
+    cythonize = None
+
 
 extensions = [
     Extension(
+        # fmt: off
         name               = 'cppbktree',
-        sources            = [ 'cppbktree/cppbktree.pyx' if buildCython
-                               else 'cppbktree/cppbktree.cpp' ],
-        include_dirs       = [ '.' ],
+        sources            = ['cppbktree/cppbktree.pyx'],
+        include_dirs       = ['.'],
         language           = 'c++',
-        extra_compile_args = [ '-std=c++11', '-O3', '-DNDEBUG' ],
+        # fmt: on
     ),
 ]
 
-if buildCython:
-    from Cython.Build import cythonize
-    extensions = cythonize( extensions, compiler_directives = { 'language_level' : '3' } )
-    del sys.argv[sys.argv.index( '--cython' )]
+if cythonize:
+    extensions = cythonize(extensions, compiler_directives={'language_level': '3'})
 
-scriptPath = os.path.abspath( os.path.dirname( __file__ ) )
-with open( os.path.join( scriptPath, 'README.md' ), encoding = 'utf-8' ) as file:
-    readmeContents = file.read()
+
+def supportsFlag(compiler, flag):
+    with tempfile.NamedTemporaryFile('w', suffix='.cpp') as file:
+        file.write('int main() { return 0; }')
+        try:
+            compiler.compile([file.name], extra_postargs=[flag])
+        except CompileError:
+            print("[Info] Compiling with argument failed. Will try another one. The above error can be ignored!")
+            return False
+    return True
+
+
+def hasInclude(compiler, systemInclude):
+    with tempfile.NamedTemporaryFile('w', suffix='.cpp') as file:
+        file.write(f'#include <{systemInclude}>\n' + 'int main() { return 0; }')
+        try:
+            compiler.compile([file.name])
+        except CompileError:
+            print(
+                f"[Info] Check for {systemInclude} system header failed. Will try without out it. "
+                "The above error can be ignored!"
+            )
+            return False
+    return True
+
+
+# https://github.com/cython/cython/blob/master/docs/src/tutorial/appendix.rst#python-38
+class Build(build_ext):
+    def build_extensions(self):
+        # This is as hacky as it gets just in order to have different compile arguments for the zlib C-code as
+        # opposed to the C++ code but I don't see another way with this subpar "build system" if you can call
+        # it even that.
+        oldCompile = self.compiler.compile
+
+        def newCompile(sources, *args, **kwargs):
+            cSources = [source for source in sources if source.endswith('.c')]
+            cppSources = [source for source in sources if not source.endswith('.c')]
+
+            objects = oldCompile(cppSources, *args, **kwargs)
+            cppCompileArgs = [
+                '-std=c++17',
+                '/std:c++17',
+            ]
+            if 'extra_postargs' in kwargs:
+                kwargs['extra_postargs'] = [x for x in kwargs['extra_postargs'] if x not in cppCompileArgs]
+            cppObjects = oldCompile(cSources, *args, **kwargs)
+            objects.extend(cppObjects)
+            return objects
+
+        self.compiler.compile = newCompile
+
+        for ext in self.extensions:
+            ext.extra_compile_args = ['-std=c++17', '-O3', '-DNDEBUG']
+
+            # https://github.com/cython/cython/issues/2670#issuecomment-432212671
+            # https://github.com/cython/cython/issues/3405#issuecomment-596975159
+            # https://bugs.python.org/issue35037
+            # https://bugs.python.org/issue4709
+            if platform.system() == 'Windows' and platform.machine().endswith('64'):
+                ext.extra_compile_args += ['-DMS_WIN64']
+
+            if self.compiler.compiler_type == 'mingw32':
+                ext.extra_link_args = [
+                    '-static-libgcc',
+                    '-static-libstdc++',
+                ]
+
+            elif self.compiler.compiler_type == 'msvc':
+                ext.extra_compile_args = [
+                    '/std:c++17',
+                    '/O2',
+                    '/DNDEBUG',
+                ]
+
+            if hasInclude(self.compiler, 'unistd.h'):
+                ext.extra_compile_args += ['-DZ_HAVE_UNISTD_H']
+
+        super(Build, self).build_extensions()
+
 
 setup(
-    name             = 'cppbktree',
-    version          = '0.0.1',
-
-    description      = 'C++ Implementation of a Burkhard-Keller Tree (BK-Tree)',
-    url              = 'https://github.com/mxmlnkn/cppbktree',
-    author           = 'Maximilian Knespel',
-    author_email     = 'mxmlnkn@github.de',
-    license          = 'MIT',
-    classifiers      = [ 'License :: OSI Approved :: MIT License',
-                         'Development Status :: 3 - Alpha',
-                         'Operating System :: POSIX',
-                         'Operating System :: Unix',
-                         'Programming Language :: Python :: 3' ],
-
-    long_description = readmeContents,
-    long_description_content_type = 'text/markdown',
-
-    py_modules       = [ 'cppbktree' ],
-    ext_modules      = extensions
+    # fmt: off
+    ext_modules = extensions,
+    cmdclass    = {'build_ext': Build},
+    # fmt: on
 )
