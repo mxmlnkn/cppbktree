@@ -1,10 +1,12 @@
 
 #include <algorithm>
+#include <chrono>
 #include <cstdint>
 #include <cstdlib>
 #include <iostream>
 #include <limits>
 #include <numeric>
+#include <random>
 #include <vector>
 
 #include <cppbktree.hpp>
@@ -14,6 +16,30 @@
 if ( !( (x) == (y) ) ) { \
     std::cerr << "Check at line " << __LINE__ << " failed! (" << (x) << " != " << (y) << ")\n"; \
     std::exit( 1 ); \
+}
+
+
+[[nodiscard]] inline std::chrono::time_point<std::chrono::high_resolution_clock>
+now()
+{
+    return std::chrono::high_resolution_clock::now();
+}
+
+
+template<typename T0, typename T1>
+[[nodiscard]] double
+duration( const T0& t0,
+          const T1& t1 = now() )
+{
+    return std::chrono::duration<double>( t1 - t0 ).count();
+}
+
+
+template<typename T0>
+[[nodiscard]] double
+duration( const T0& t0 )
+{
+    return duration( t0, now() );
 }
 
 
@@ -136,8 +162,43 @@ checkBKTree()
 }
 
 
+void
+benchmarkHammingLookup()
+{
+    const auto t0 = now();
+
+    std::random_device randomDevice;
+    std::default_random_engine randomEngine( randomDevice() );
+    std::uniform_int_distribution<uint64_t> distribution( 0 );
+
+    std::vector<uint64_t> hashes( 100'000'000 );
+    for ( auto& h : hashes ) {
+        h = distribution( randomEngine );
+    }
+
+    const auto t1 = now();
+    std::cerr << "Generating random numbers took " << duration( t0, t1 ) << " s\n";
+
+    const uint64_t needle( 0x1234'5678'90AB'CDEFULL );
+
+
+    #pragma omp parallel for simd
+    for ( size_t i = 0; i < hashes.size(); ++i ) {
+        hashes[i] = std::bitset<64>( hashes[i] ^needle ).count() < 10;
+    }
+
+    const auto t2 = now();
+    std::cerr << "Xoring took " << duration( t1, t2 ) << " s\n";
+
+    std::cerr << "hashes[333]: " << hashes[333] << "\n";
+}
+
+
 int main()
 {
+    benchmarkHammingLookup();
+    return 0;
+
     checkCountBits();
     checkHammingDistance();
     checkBKTree();
