@@ -218,6 +218,7 @@ checkBKTree()
 }
 
 
+#ifdef __AVX__
 alignas( sizeof( __m128i ) ) static constexpr auto BIT_COUNT_LUT =
     [] ()
     {
@@ -233,7 +234,6 @@ alignas( sizeof( __m128i ) ) static constexpr auto BIT_COUNT_LUT =
     }();
 
 
-#ifdef __AVX__
 [[nodiscard]] std::vector<uint8_t>
 countDifferingBits8( const AlignedVector<uint8_t>& haystack,
                      const uint8_t                 needle )
@@ -1053,9 +1053,9 @@ benchmarkCppBkTreeHammingLookup()
 int main()
 {
     testCountDifferingBits8();
-    benchmarkHammingLookup( 100'000'000, 0 );
-    benchmarkHammingLookup( 100'000'000, 2 );
-    benchmarkHammingLookup( 100'000'000, 12 );
+    //benchmarkHammingLookup( 100'000'000, 0 );
+    //benchmarkHammingLookup( 100'000'000, 2 );
+    //benchmarkHammingLookup( 100'000'000, 12 );
 
     checkCountBits();
     checkHammingDistance();

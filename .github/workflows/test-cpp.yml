@@ -1,0 +1,93 @@
+name: C++ Code Checks
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  Code-Coverage:
+    name: Code Coverage
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get -y install clang g++
+
+  Asan:
+    name: ASan
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get -y install clang g++
+
+    - name: Run Tests With Sanitizers
+      run: |
+        cd tests
+        sanitized=address
+        CXX=clang++ CFLAGS=-fsanitize=$sanitized LFLAGS=-fsanitize=$sanitized make -B
+
+  UBSan:
+    name: UBSan
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get -y install clang g++
+
+    - name: Run Tests With Sanitizers
+      run: |
+        cd tests
+        sanitized=undefined
+        CXX=clang++ CFLAGS=-fsanitize=$sanitized LFLAGS=-fsanitize=$sanitized make -B
+
+  Safe-Stack:
+    name: Safe-Stack
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get -y install clang g++
+
+    - name: Run Tests With Sanitizers
+      run: |
+        cd tests
+        sanitized=safe-stack
+        CXX=clang++ CFLAGS=-fsanitize=$sanitized LFLAGS=-fsanitize=$sanitized make -B
+
+  Tests:
+    name: Tests
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get -y install g++
+        python3 -m pip install --upgrade-strategy eager --upgrade cython build
+
+    - name: Install Python Module
+      shell: bash
+      run: |
+        python3 -m build
+        python3 -m pip install dist/*.tar.gz
