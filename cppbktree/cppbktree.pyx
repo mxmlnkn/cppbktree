@@ -72,24 +72,17 @@ cdef extern from "cppbktree.hpp":
         #   https://docs.python.org/3/library/ctypes.html#callback-functions
         #   https://stackoverflow.com/questions/39044063/pass-a-closure-from-cython-to-c
         #   https://stackoverflow.com/questions/34878942/using-function-pointers-to-methods-of-classes-without-the-gil/34900829#34900829
-        CppBKTree(const vector[T_ValueType]&) except +
-        CppBKTree(const string&) except +
+        CppBKTree(vector[T_ValueType]) except +
         vector[size_t] find(const T_ValueType&, unsigned short int) except +
         size_t size() except +
         TreeStatistics statistics() except +
-        void serialize(const string&) except +
 
 
 cdef class _BKTree:
     cdef CppBKTree[vector[uint8_t], size_t]* tree
 
     def __cinit__(self, list_of_hashes_or_file_name):
-        if isinstance(list_of_hashes_or_file_name, str):
-            self.tree = new CppBKTree[vector[uint8_t], size_t](<string>list_of_hashes_or_file_name.encode())
-        elif isinstance(list_of_hashes_or_file_name, bytes):
-            self.tree = new CppBKTree[vector[uint8_t], size_t](<string>list_of_hashes_or_file_name)
-        else:
-            self.tree = new CppBKTree[vector[uint8_t], size_t](<vector[vector[uint8_t]]>list_of_hashes_or_file_name)
+        self.tree = new CppBKTree[vector[uint8_t], size_t](<vector[vector[uint8_t]]>list_of_hashes_or_file_name)
 
     def __dealloc__(self):
         del self.tree
@@ -118,11 +111,6 @@ cdef class _BKTree:
         }
         return stats
 
-    def serialize(self, file_name):
-        if isinstance(file_name, str):
-            return self.tree.serialize(<string>file_name.encode())
-        else:
-            return self.tree.serialize(<string>file_name)
 
 
 # Extra class because cdefs are not visible from outside
@@ -139,8 +127,6 @@ class BKTree:
     def statistics(self):
         return self.tree.statistics()
 
-    def serialize(self, file_name):
-        return self.tree.serialize(file_name)
 
 
 __version__ = '0.0.1'

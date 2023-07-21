@@ -215,34 +215,6 @@ checkBKTree()
     }
 
     /* Do some generic tests by comparing BKTree find with the results of a linear search. */
-
-    /* Check saving and loading */
-    const Values samples = { { 5 }, { 7 }, { 6 }, { 0 }, { 13 }, { 3 }, { 9 }, { 10 } };
-    for ( size_t i = 0; i < samples.size(); ++i ) {
-        auto subsamples = samples;
-        subsamples.resize( i );
-        std::stringstream buffer;
-
-        BKTree tree( hammingDistance, subsamples );
-        tree.serialize( buffer );
-
-        BKTree loadedTree( hammingDistance );
-        //loadedTree.deserialize( buffer );
-
-        //CHECK( tree, loadedTree );
-    }
-
-    {
-        std::stringstream buffer;
-
-        BKTree tree( hammingDistance, createRandomVectorVector( 256, 2 ) );
-        tree.serialize( buffer );
-
-        BKTree loadedTree( hammingDistance );
-        //loadedTree.deserialize( buffer );
-
-        //CHECK( tree, loadedTree );
-    }
 }
 
 
