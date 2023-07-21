@@ -18,7 +18,13 @@ operator<<( std::ostream&         out,
         out << " ";
 
         //out << std::showbase << std::internal << std::setfill( '0' ) << std::hex << std::setw( 2 );
-        out << static_cast<unsigned int>( x );
+        if constexpr ( std::is_same_v<uint8_t, T> ) {
+            out << static_cast<unsigned int>( x );
+        } else if constexpr ( std::is_same_v<int8_t, T> ) {
+            out << static_cast<int>( x );
+        } else {
+            out << x;
+        }
         out.copyfmt( ioState );
     }
 

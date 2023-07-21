@@ -12,6 +12,7 @@
 #include <limits>
 #include <map>
 #include <memory>
+#include <numeric>
 #include <stack>
 #include <stdexcept>
 #include <tuple>
@@ -144,13 +145,21 @@ public:
     using DistanceType   = T_DistanceType;
     using MetricFunction = std::function<DistanceType( const ValueType&, const ValueType& )>;
 
+    /* Benchmarks show that linear lookup of 1 to ~1000 all take roughly the same time.
+     * Only after that, the cost begins to scale linearly up. */
+    static constexpr size_t CHUNK_SIZE = 1024;
+
     struct Node
     {
         /**
-         * Even if there are other values with a hamming distance of zero for this node,
-         * it must suffice to only store one value because of the identity of indiscernibles axiom of metrics.
+         * This is the bisection value for this node. For leaf nodes, it is only tentative and is effectively unused.
          */
-        ValueType value;
+        ValueType referenceValue;
+
+        /**
+         * Even if the CHUNK_SIZE is 1, there might be other values with a hamming distance of zero for this node.
+         */
+        std::vector<ValueType> values;
         /**
          * for now only an ordinal number signifying when it was inserted.
          * 0 for the first inserted, 1 for the second inserted item, and so on.
@@ -161,10 +170,119 @@ public:
 
     public:
         void
+        addToChild( ValueType             value,
+                    size_t                payload,
+                    const MetricFunction& metricFunction )
+        {
+            const auto distance = metricFunction( referenceValue, value );
+            const auto child = children.find( distance );
+            if ( child == children.end() ) {
+                auto node = std::unique_ptr<Node>( new Node{ value, { value }, { payload }, {} } );
+                children.emplace( distance, std::move( node ) );
+            } else {
+                child->second->add( std::move( value ), payload, metricFunction );
+            }
+        }
+
+        void
+        add( ValueType             value,
+             size_t                payload,
+             const MetricFunction& metricFunction )
+        {
+            /** Simply append to leaf nodes. They are split inside @ref rebalance. */
+            if ( children.empty() && ( values.size() == payloads.size() ) ) {
+                values.emplace_back( std::move( value ) );
+                payloads.emplace_back( payload );
+            } else {
+                addToChild( std::move( value ), payload, metricFunction );
+            }
+        }
+
+        void
+        rebalance( const MetricFunction& metricFunction )
+        {
+            /* Would be good to have a maximum possible hamming distance safely derived
+             * from ValueType and MetricFunction. But even if we had that, the ideal chunk size also depends
+             * on the benchmarks, which are dependant on both. Not possibly to do it generically autlomatically.
+             * Simply assume std::vecto<uint8_t> with 8 values (effectively uint64_t) for now.
+             * One problem here is that a single node split on average would lead to maximum distance more nodes.
+             * For uint64_t, this means almost two magnitudes more nodes for a single split.
+             * This makes the tradeoff consideration for splitting vs not splitting difficult.
+             * For large distance lookups (distance > maximum distance / 4), splitting is not necessary at all.
+             * This means, we are doing this to optimize small distances such as distance = 0.
+             * For distance = 0, we need to find splitting makes almost always sense, except if a linear lookup
+             * is not reduced any further, which is the case for element counts < 1k.
+             * However, splitting for more than 1k would result in sub nodes with each only ~16 elements!
+             * This would impede lookup for large distances!
+             * Therefore, do a compromise and split at 10k. Note that 100k is the point at which linear lookup
+             * becomes slower than BK tree lookup for distance == 0. So any split point < 100k would be fine
+             * even if not ideal. */
+            if ( payloads.size() > 32ULL * 1024ULL ) {
+                referenceValue = values.back();
+                std::vector<size_t> zeroDistancePayloads;
+                for ( size_t i = 0; i < std::min( values.size(), payloads.size() ); ++i ) {
+                    const auto distance = metricFunction( referenceValue, values[i] );
+                    if ( distance == 0 ) {
+                        zeroDistancePayloads.emplace_back( payloads[i] );
+                    } else {
+                        addToChild( std::move( values[i] ), payloads[i], metricFunction );
+                    }
+                }
+                values.clear();
+                payloads = std::move( zeroDistancePayloads );
+            }
+
+            for ( const auto& [_, child] : children ) {
+                child->rebalance( metricFunction );
+            }
+        }
+
+        [[nodiscard]] std::vector<size_t>
+        find( const ValueType&      value,
+              DistanceType          distance,
+              const MetricFunction& metricFunction ) const
+        {
+            std::vector<size_t> result;
+
+            if ( children.empty() && ( values.size() == payloads.size() ) ) {
+                for ( size_t i = 0; i < values.size(); ++i ) {
+                    if ( metricFunction( value, values[i] ) <= distance ) {
+                        result.emplace_back( payloads[i] );
+                    }
+                }
+                return result;
+            }
+
+            /* If there are children or more payloads than values, then @ref referenceValue should be valid! */
+            const auto distanceToThisNode = metricFunction( value, referenceValue );
+            if ( distanceToThisNode <= distance ) {
+                std::copy( payloads.begin(), payloads.end(), std::back_inserter( result ) );
+            }
+
+            /* The map of children is inherently sorted by distance, so it suffices
+             * to search for a lower bound and then iterate to the upper bound.
+             * Be pedantic for overflow checks! */
+            const auto lowerBound = distanceToThisNode >= distance ? distanceToThisNode - distance : 0;
+            const auto upperBound = std::numeric_limits<DistanceType>::max() - distanceToThisNode >= distance
+                                    ? distanceToThisNode + distance
+                                    : std::numeric_limits<DistanceType>::max();
+            for ( auto candidate = children.lower_bound( lowerBound );
+                  ( candidate->first <= upperBound ) && ( candidate != children.end() );
+                  ++candidate )
+            {
+                const auto recursiveResult = candidate->second->find( value, distance, metricFunction );
+                result.insert( result.end(), recursiveResult.begin(), recursiveResult.end() );
+            }
+
+            return result;
+        }
+
+        void
         serialize( std::ostream& out,
                    uint32_t      depth ) const
         {
-            serializeVector( out, value );
+            serializeVector( out, referenceValue );
+            serializeVector( out, values );
             serializeVector( out, payloads );
 
             for ( const auto& child : children ) {
@@ -183,7 +301,8 @@ public:
         {
             static_assert( std::is_same<ValueType, std::vector<uint8_t> >::value,
                            "Not yet working for generic value types!" );
-            deserializeVector( in, &value );
+            deserializeVector( in, &referenceValue );
+            deserializeVector( in, &values );
             deserializeVector( in, &payloads );
 
             /* File is not good if EOF is reached. EOF is only reached when trying to read bytes after it.
@@ -237,7 +356,8 @@ public:
         bool
         operator==( const Node& other ) const
         {
-            if ( ( value           != other.value           ) ||
+            if ( ( referenceValue  != other.referenceValue  ) ||
+                 ( values          != other.values          ) ||
                  ( payloads        != other.payloads        ) ||
                  ( children.size() != other.children.size() ) )
             {
@@ -273,7 +393,7 @@ public:
             std::ios ioState( nullptr );
             ioState.copyfmt( out );
 
-            out << "Value: " << value << ", Payloads: " << payloads << std::endl;
+            out << "Value: " << referenceValue << ", Values: " << values << ", Payloads: " << payloads << std::endl;
 
             for ( const auto& child : children ) {
                 out << std::setw( ( depth + 1 ) * 2 ) << std::setfill( ' ' ) << ""
@@ -308,6 +428,9 @@ public:
          * All values have the same bit count or else hammingDistance will throw.
          */
         size_t valueBitCount = 0;
+
+        size_t minPayloadsPerNode{ 0 };
+        size_t maxPayloadsPerNode{ 0 };
     };
 
 public:
@@ -316,22 +439,22 @@ public:
      */
     explicit
     CppBKTree( MetricFunction metricFunction,
-               const std::vector<ValueType>& values = {} ) :
+               std::vector<ValueType> values = {} ) :
+        m_itemCount( values.size() ),
         m_metricFunction( metricFunction )
     {
-        for ( const auto& value : values ) {
-            add( value );
+        if ( !values.empty() ) {
+            std::vector<size_t> payloads( m_itemCount );
+            std::iota( payloads.begin(), payloads.end(), 0 );
+            m_root = std::unique_ptr<Node>( new Node{ {}, std::move( values ), std::move( payloads ), {} } );
         }
+        rebalance();
     }
 
     explicit
-    CppBKTree( const std::vector<ValueType>& values = {} ) :
-        m_metricFunction( &hammingDistance )
-    {
-        for ( const auto& value : values ) {
-            add( value );
-        }
-    }
+    CppBKTree( std::vector<ValueType> values = {} ) :
+        CppBKTree( &hammingDistance, std::move( values ) )
+    {}
 
     explicit
     CppBKTree( const std::string& fileName ) :
@@ -342,112 +465,31 @@ public:
     }
 
     void
-    add( const ValueType& value )
+    add( ValueType value )
     {
-        if ( !m_root ) {
-            m_root = std::unique_ptr<Node>( new Node{ value, { m_itemCount++ }, {} } );
-            return;
-        }
-
-        /* Descend into the tree along edges with equal distance to the node's item until there is no such edge. */
-        auto* ppnode = &m_root;
-        while ( true ) {
-            const auto distance = m_metricFunction( (*ppnode)->value, value );
-
-            /* Append identical value to this node */
-            if ( distance == 0 ) {
-                (*ppnode)->payloads.push_back( m_itemCount++ );
-                break;
-            }
-
-            /* Insert a new child */
-            auto& children = (*ppnode)->children;
-            const auto child = children.find( distance );
-            if ( child == children.end() ) {
-                children.emplace( distance, std::unique_ptr<Node>( new Node{ value, { m_itemCount++ }, {} } ) );
-                break;
-            }
-
-            /* Descend along the found edge */
-            ppnode = &child->second;
+        if ( m_root ) {
+            m_root->add( std::move( value ), m_itemCount++, m_metricFunction );
+        } else {
+            m_root = std::unique_ptr<Node>( new Node{ {}, { value }, { m_itemCount++ }, /* children */ {} } );
         }
     }
 
-    std::vector<size_t>
-    find( const ValueType&             value,
-          DistanceType                 distance,
-          const std::unique_ptr<Node>* root = nullptr ) const
+    void
+    rebalance()
     {
-        if ( root == nullptr ) {
-            if ( !m_root ) {
-                return {};
-            }
-            return find( value, distance, &m_root );
+        if ( m_root ) {
+            m_root->rebalance( m_metricFunction );
         }
+    }
 
-        std::vector<size_t> result;
-
-        std::stack<const std::unique_ptr<Node>*> candidates;
-        candidates.push( root );
-        while ( !candidates.empty() ) {
-            const auto ppnode = candidates.top();
-            candidates.pop();
-            const auto distanceToThisNode = m_metricFunction( (*ppnode)->value, value );
-
-            if ( distanceToThisNode <= distance ) {
-                const auto& payloads = (*ppnode)->payloads;
-                std::copy( payloads.begin(), payloads.end(), std::back_inserter( result ) );
-            }
-
-            /* The map of children is inherently sorted by distance, so it suffices
-             * to search for a lower bound and then iterate to the upper bound.
-             * Be pedantic for overflow checks! */
-            const auto lowerBound = distanceToThisNode >= distance ? distanceToThisNode - distance : 0;
-            const auto upperBound = std::numeric_limits<DistanceType>::max() - distanceToThisNode >= distance
-                                    ? distanceToThisNode + distance
-                                    : std::numeric_limits<DistanceType>::max();
-            for ( auto candidate = (*ppnode)->children.lower_bound( lowerBound );
-                  ( candidate->first <= upperBound ) && ( candidate != (*ppnode)->children.end() );
-                  ++candidate )
-            {
-                /**
-                 * Consider a hash with n bits. The distance will range in [0,n]. The hash will have at most 2^n
-                 * distinct values and therefore tree nodes. Assuming a balanced tree, a depth d will be able to
-                 * encode n^d values. As there are only 2^n values possible, the max depth D is given as 2^n = n^D.
-                 * This is equivalent to n log(2) = D log(n) giving D = n log(2) / log(n).
-                 * For most hashes, recursion shouldn't be a problem but I don't know. I arbitrarily decided
-                 * to avoid recursion using a stack. This might also help avoiding multiple copies.
-                 * In the worst case, the stack will have to store d * n pointers because the push pop mechanism
-                 * basically boils down to a depth-first search.
-                 * Note that the maxium depth for a very uneven tree would be D = n if we inserted successively
-                 * elements with distance one from each other. This would only require n elements so deep trees
-                 * can do happen for few elements.
-                 * I compared three versions:
-                 *  1. A recursive version, which is still in the code with FIND_RECURSIVE = true
-                 *  2. A depth-first search using a stack, which is still in the code with FIND_RECURSIVE = false
-                 *  3. A temporary version using a vector with a capacity of maxDistance * log(2) / log( maxDistance ).
-                 *     It might have been better to simply use .reserve( maxDistance ) but I checked with debug output
-                 *     and the vector size never seemed to exceed the capacity, so there should be no reallocations.
-                 * The benchmark also always compares the results to the pybktree implementation, so the results should
-                 * be correct.
-                 * Conclusion: All versions suffer a performance degradation after 2e4 (1), 2e4 (2), 3e3 (3) elements.
-                 *             The recursive version is pretty much identical to the version using the stack.
-                 *             The vector version has better performance than the other versions for 3e3 elements,
-                 *             but then the runtime suddenly spikes to 1e-4 seconds and the scalings for all different
-                 *             distance threshold begin to overlap, probably because some huge offset make them
-                 *             pretty much indiscernible.
-                 *             For distances <= 8 (n=64), this version is actually slower than pybktree!
-                 */
-                if ( FIND_RECURSIVE ) {
-                    const auto recursiveResult = find( value, distance, &candidate->second );
-                    result.insert( result.end(), recursiveResult.begin(), recursiveResult.end() );
-                } else {
-                    candidates.push( &candidate->second );
-                }
-            }
+    [[nodiscard]] std::vector<size_t>
+    find( const ValueType& value,
+          DistanceType     distance ) const
+    {
+        if ( m_root ) {
+            return m_root->find( value, distance, m_metricFunction );
         }
-
-        return result;
+        return {};
     }
 
     size_t
@@ -467,8 +509,21 @@ public:
         }
 
         TreeStatistics result;
-        result.valueBitCount = m_root->value.size() * std::numeric_limits<uint8_t>::digits;
+
+        if constexpr ( std::is_integral_v<ValueType> ) {
+            result.valueBitCount = std::numeric_limits<ValueType>::digits;
+        } else {
+            const auto elementCount = m_root->values.empty()
+                                      ? m_root->referenceValue.size()
+                                      : m_root->values.front().size();
+            result.valueBitCount = elementCount * std::numeric_limits<uint8_t>::digits;
+        }
+
         result.minChildrenPerNode = std::numeric_limits<decltype( result.minChildrenPerNode )>::max();
+        result.maxChildrenPerNode = std::numeric_limits<decltype( result.minChildrenPerNode )>::min();
+
+        result.minPayloadsPerNode = std::numeric_limits<decltype( result.minPayloadsPerNode )>::max();
+        result.maxPayloadsPerNode = std::numeric_limits<decltype( result.minPayloadsPerNode )>::min();
 
         std::stack<std::pair<const std::unique_ptr<Node>*, /* depth */ size_t> > nodesToProcess;
         nodesToProcess.push( std::make_pair( &m_root, 1 ) );
@@ -490,9 +545,18 @@ public:
                 result.maxChildrenPerNode = std::max( result.maxChildrenPerNode, children.size() );
             }
 
+            const auto& payloads = (*ppnode)->payloads;
+            result.minPayloadsPerNode = std::min( result.minPayloadsPerNode, payloads.size() );
+            result.maxPayloadsPerNode = std::max( result.maxPayloadsPerNode, payloads.size() );
+
             for ( auto child = children.begin(); child != children.end(); ++child ) {
                 nodesToProcess.push( std::make_pair( &child->second, nodeDepth + 1 ) );
             }
+        }
+
+        if ( result.minChildrenPerNode > result.maxChildrenPerNode ) {
+            result.minChildrenPerNode = 0;
+            result.maxChildrenPerNode = 0;
         }
 
         result.duplicateCount = result.valueCount - result.nodeCount;
@@ -580,5 +644,4 @@ private:
     std::unique_ptr<Node> m_root;
     size_t m_itemCount = 0;
     const MetricFunction m_metricFunction;
-    static constexpr bool FIND_RECURSIVE = false;
 };

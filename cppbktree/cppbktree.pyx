@@ -1,3 +1,5 @@
+# distutils: language=c++
+
 from libc.stdlib cimport malloc, free
 from libc.stdio cimport SEEK_SET
 from libc.stdint cimport uint8_t, uint64_t
@@ -48,6 +50,7 @@ class LinearLookup64:
 
 cdef extern from "cppbktree.hpp":
     size_t hammingDistance(const vector[uint8_t]&, const vector[uint8_t]& ) except +
+    size_t hammingDistance64( const uint64_t, const uint64_t ) except +;
 
     cppclass CppBKTree[T_ValueType, T_DistanceType]:
         struct TreeStatistics:
@@ -60,6 +63,8 @@ cdef extern from "cppbktree.hpp":
             size_t maxDepth
             size_t minChildrenPerNode
             size_t maxChildrenPerNode
+            size_t minPayloadsPerNode
+            size_t maxPayloadsPerNode
             size_t duplicateCount
             size_t valueBitCount
 
@@ -106,6 +111,8 @@ cdef class _BKTree:
             'maxDepth'                 : result.maxDepth                ,
             'minChildrenPerNode'       : result.minChildrenPerNode      ,
             'maxChildrenPerNode'       : result.maxChildrenPerNode      ,
+            'minPayloadsPerNode'       : result.minPayloadsPerNode      ,
+            'maxPayloadsPerNode'       : result.maxPayloadsPerNode      ,
             'duplicateCount'           : result.duplicateCount          ,
             'valueBitCount'            : result.valueBitCount           ,
         }
