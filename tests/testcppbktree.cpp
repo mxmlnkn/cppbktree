@@ -849,7 +849,8 @@ benchmarkTreeHammingLookup64( const AlignedVector<uint64_t>& haystack,
 {
     std::vector<uint64_t> copy( haystack.begin(), haystack.end() );
     const auto t0 = now();
-    const CppBKTree<uint64_t, size_t> bkTree( hammingDistance64, copy );
+    CppBKTree<uint64_t, size_t> bkTree( hammingDistance64, copy );
+    bkTree.rebalance( 32ULL * 1024ULL );
     const auto t1 = now();
     std::cerr << "Creating BK tree from " << haystack.size() << " values took " << duration( t0, t1 ) << " s\n";
 
@@ -897,7 +898,8 @@ benchmarkTreeHammingLookupVector( const AlignedVector<uint64_t>& haystack,
     std::transform( haystack.begin(), haystack.end(), converted.begin(), toVector );
 
     const auto t0 = now();
-    const BKTree bkTree( hammingDistance, converted );
+    BKTree bkTree( hammingDistance, converted );
+    bkTree.rebalance( 32ULL * 1024ULL );
     const auto t1 = now();
     std::cerr << "Creating std::vector<uint8_t> BK tree from " << haystack.size()
               << " values took " << duration( t0, t1 ) << " s\n";

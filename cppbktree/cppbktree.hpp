@@ -21,8 +21,6 @@
 #include <vector>
 
 
-namespace
-{
 template<typename T,
          typename std::enable_if<std::is_integral<T>::value, int>::type = 0>
 size_t
@@ -38,7 +36,7 @@ countBits( T x )
 }
 
 
-size_t
+inline size_t
 hammingDistance( const std::vector<uint8_t>& a,
                  const std::vector<uint8_t>& b )
 {
@@ -64,12 +62,11 @@ hammingDistance( const std::vector<uint8_t>& a,
 }
 
 
-[[maybe_unused]] size_t
+inline size_t
 hammingDistance64( const uint64_t a,
                    const uint64_t b )
 {
     return countBits( a ^ b );
-}
 }
 
 
@@ -136,7 +133,8 @@ public:
         }
 
         void
-        rebalance( const MetricFunction& metricFunction )
+        rebalance( const size_t          maxElementCount,
+                   const MetricFunction& metricFunction )
         {
             /* Would be good to have a maximum possible hamming distance safely derived
              * from ValueType and MetricFunction. But even if we had that, the ideal chunk size also depends
@@ -154,7 +152,7 @@ public:
              * Therefore, do a compromise and split at 10k. Note that 100k is the point at which linear lookup
              * becomes slower than BK tree lookup for distance == 0. So any split point < 100k would be fine
              * even if not ideal. */
-            if ( payloads.size() > 32ULL * 1024ULL ) {
+            if ( payloads.size() > maxElementCount ) {
                 referenceValue = values.back();
                 std::vector<size_t> zeroDistancePayloads;
                 for ( size_t i = 0; i < std::min( values.size(), payloads.size() ); ++i ) {
@@ -170,7 +168,7 @@ public:
             }
 
             for ( const auto& [_, child] : children ) {
-                child->rebalance( metricFunction );
+                child->rebalance( maxElementCount, metricFunction );
             }
         }
 
@@ -309,12 +307,11 @@ public:
             std::iota( payloads.begin(), payloads.end(), 0 );
             m_root = std::unique_ptr<Node>( new Node{ {}, std::move( values ), std::move( payloads ), {} } );
         }
-        rebalance();
     }
 
     explicit
     CppBKTree( std::vector<ValueType> values = {} ) :
-        CppBKTree( &hammingDistance, std::move( values ) )
+        CppBKTree( MetricFunction{}, std::move( values ) )
     {}
 
     void
@@ -328,10 +325,10 @@ public:
     }
 
     void
-    rebalance()
+    rebalance( const size_t maxElementCount )
     {
         if ( m_root ) {
-            m_root->rebalance( m_metricFunction );
+            m_root->rebalance( maxElementCount, m_metricFunction );
         }
     }
 

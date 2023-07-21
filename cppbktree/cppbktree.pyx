@@ -76,6 +76,7 @@ cdef extern from "cppbktree.hpp":
         vector[size_t] find(const T_ValueType&, unsigned short int) except +
         size_t size() except +
         TreeStatistics statistics() except +
+        void rebalance(const size_t) except +
 
 
 cdef class _BKTree:
@@ -83,6 +84,7 @@ cdef class _BKTree:
 
     def __cinit__(self, list_of_hashes_or_file_name):
         self.tree = new CppBKTree[vector[uint8_t], size_t](<vector[vector[uint8_t]]>list_of_hashes_or_file_name)
+        self.tree.rebalance( 32 * 1024 );
 
     def __dealloc__(self):
         del self.tree
@@ -111,6 +113,46 @@ cdef class _BKTree:
         }
         return stats
 
+    def rebalance(self, max_element_count):
+        return self.tree.rebalance(<size_t>max_element_count)
+
+
+cdef class _BKTree64:
+    cdef CppBKTree[uint64_t, size_t]* tree
+
+    def __cinit__(self, list_of_hashes_or_file_name):
+        self.tree = new CppBKTree[uint64_t, size_t](list_of_hashes_or_file_name)
+        self.tree.rebalance( 32 * 1024 );
+
+    def __dealloc__(self):
+        del self.tree
+
+    def find(self, query, distance=0):
+        return <list>(self.tree.find(<uint64_t>query, distance))
+
+    def size(self):
+        return self.tree.size()
+
+    def statistics(self):
+        # Automatic POD to dict conversion did not work for me. Maybe because the contained types?
+        cdef CppBKTree[uint64_t, size_t].TreeStatistics result = self.tree.statistics();
+        stats = {
+            'nodeCount'                : result.nodeCount               ,
+            'leafCount'                : result.leafCount               ,
+            'valueCount'               : result.valueCount              ,
+            'averageChildCountPerNode' : result.averageChildCountPerNode,
+            'maxDepth'                 : result.maxDepth                ,
+            'minChildrenPerNode'       : result.minChildrenPerNode      ,
+            'maxChildrenPerNode'       : result.maxChildrenPerNode      ,
+            'minPayloadsPerNode'       : result.minPayloadsPerNode      ,
+            'maxPayloadsPerNode'       : result.maxPayloadsPerNode      ,
+            'duplicateCount'           : result.duplicateCount          ,
+            'valueBitCount'            : result.valueBitCount           ,
+        }
+        return stats
+
+    def rebalance(self, max_element_count):
+        return self.tree.rebalance(<size_t>max_element_count)
 
 
 # Extra class because cdefs are not visible from outside
@@ -127,6 +169,25 @@ class BKTree:
     def statistics(self):
         return self.tree.statistics()
 
+    def rebalance(self, max_element_count):
+        return self.tree.rebalance(max_element_count)
+
+
+class BKTree64:
+    def __init__(self, list_of_hashes):
+        self.tree = _BKTree64(list_of_hashes)
+
+    def find(self, query, distance=0):
+        return self.tree.find(query, distance)
+
+    def size(self):
+        return self.tree.size()
+
+    def statistics(self):
+        return self.tree.statistics()
+
+    def rebalance(self, max_element_count):
+        return self.tree.rebalance(max_element_count)
 
 
 __version__ = '0.0.1'
