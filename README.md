@@ -99,3 +99,17 @@ At least in this benchmark with only 64-bit hashes and a hamming distance as met
 The vptree module is almost always slower.
 The lookups are actually quite similar to pybktree (meaning still slower than lookups with cppbktree) but the tree creation is a full magnitude slower.
 For the 100k elements, this results in pybktree being 7.7 times faster than vptree.
+
+
+## Comparison linear lookup vs. cppbktree
+
+![Comparison pybktree cppbktree](benchmark/results/compare-scalings-cppbktree-linear-lookup.png)
+
+This log-log comparison plot shows that a simple linear lookup can compete with a BK tree.
+For exact and almost exact lookups, the BK tree can become faster but even for a distance of 2,
+it requires more than 1 M elements of size 8 B to amortize.
+For lookups with even larger distance, the simple linear lookup dominates for the whole tested range up to 80 MB of data!
+
+The advantage of the linear lookup is better streaming behavior and less branching making it run faster on modern CPUs.
+For batched lookup, the advantage might be even larger because whole batches can be looked up while the chunks of the haystack is still in CPU caches.
+A mixture a BK tree and linear lookup, e.g., a BK tree with nodes with 1-10k elements, might be better over the whole range of test configurations.

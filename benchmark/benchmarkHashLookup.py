@@ -3,17 +3,79 @@
 
 import os
 import pprint
+import sys
 import time
 
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 import numpy as np
-import pybktree
 import scipy.stats
 import tqdm
 import cppbktree
-import vptree
 
+try:
+    import pybktree
+except ImportError:
+    pass
+
+try:
+    import vptree
+except ImportError:
+    pass
+
+
+def benchmark_linear_lookup( element_counts, repeat_count = 10 ):
+    """
+    Returns a list of triples:
+      - elements
+      - tree creation time in seconds
+      - lookup time for one element in seconds
+    """
+    timings = []
+    for element_count in tqdm.tqdm( element_counts ):
+        timing = [ element_count ]
+
+        # Compare results to pybktree and print out statistics
+        for distance in [ 0, 1, 2, 4, 8, 16 ]:
+            elements = np.random.randint( np.iinfo( np.uint64 ).max, size = element_count, dtype = np.uint64 )
+
+            cpptree = cppbktree.LinearLookup64( elements )
+            cppresults = sorted( elements[cpptree.find( 0, distance )] )
+            print( "CppResults:", cppresults )
+
+            if 'pybktree' in sys.modules:
+                pytree = pybktree.BKTree( pybktree.hamming_distance, elements )
+                pyresults = sorted( [ x[1] for x in pytree.find( np.uint64( 0 ), distance ) ] )
+                print( "PyResults:", pyresults )
+
+                assert np.all( pyresults == cppresults )
+
+
+        runtimes = []
+        for i in range( repeat_count ):
+            # BKTree only takes bytearrays as values and internally assumes a hamming_distance for now
+            # because it's trouble to specify arbitrary objects and metrics through the Cython interface.
+            elements = np.random.randint( np.iinfo( np.uint64 ).max, size = element_count, dtype = np.uint64 )
+            t0 = time.time()
+            database = cppbktree.LinearLookup64( elements )
+            t1 = time.time()
+            runtimes.append( t1 - t0 )
+        timing += [ np.mean( runtimes ), np.std( runtimes ) ]
+
+        for distance in [ 0, 1, 2, 4, 8, 16 ]:
+            runtimes = []
+            for i in range( repeat_count ):
+                elements = np.random.randint( np.iinfo( np.uint64 ).max, size = element_count, dtype = np.uint64 )
+                database = cppbktree.LinearLookup64( elements )
+                t0 = time.time()
+                results = database.find( 0, distance )
+                t1 = time.time()
+                runtimes.append( t1 - t0 )
+            timing += [ distance, np.mean( runtimes ), np.std( runtimes ) ]
+
+        timings.append( timing )
+
+    return timings
 
 def benchmark_cppbktree( element_counts, repeat_count = 10 ):
     """
@@ -30,16 +92,17 @@ def benchmark_cppbktree( element_counts, repeat_count = 10 ):
         for distance in [ 0, 1, 2, 4, 8, 16 ]:
             elements = np.random.randint( np.iinfo( np.uint64 ).max, size = element_count, dtype = np.uint64 )
 
-            pytree = pybktree.BKTree( pybktree.hamming_distance, elements )
-            pyresults = sorted( [ x[1] for x in pytree.find( np.uint64( 0 ), distance ) ] )
-
             byte_elements = [ int( x ).to_bytes( 8, 'big' ) for x in elements ]
             cpptree = cppbktree.BKTree( byte_elements )
             cppresults = sorted( elements[cpptree.find( ( 0 ).to_bytes( 8, 'big' ), distance )] )
-
-            print( "PyResults:", pyresults )
             print( "CppResults:", cppresults )
-            assert np.all( pyresults == cppresults )
+
+            if 'pybktree' in sys.modules:
+                pytree = pybktree.BKTree( pybktree.hamming_distance, elements )
+                pyresults = sorted( [ x[1] for x in pytree.find( np.uint64( 0 ), distance ) ] )
+                print( "PyResults:", pyresults )
+
+                assert np.all( pyresults == cppresults )
 
             print( f"Tree statistics for {element_count} elements and distance <= {distance}: {cpptree.statistics()}" )
             print()
@@ -255,7 +318,7 @@ def compare_scaling( data_files, export_name = None, print_numerical_comparison 
 
     if print_numerical_comparison and len( data_files ) == 2:
         # Give out some textual speedups for 1e7 elements
-        data1  = np.genfromtxt( data_files[0] );
+        data1 = np.genfromtxt( data_files[0] );
         data2 = np.genfromtxt( data_files[1] );
         element_count = data1[-1,0]
         assert element_count == data2[-1,0]
@@ -266,28 +329,45 @@ def compare_scaling( data_files, export_name = None, print_numerical_comparison 
 
 
 if __name__ == '__main__':
-    if False:
-        if not os.path.exists( 'results/pybktree-scaling.dat' ):
-            timings = benchmark_pybktree( np.unique( ( 10 ** np.linspace( 0, 5, 40 ) ).astype( np.int ) ) )
-            np.savetxt( 'results/pybktree-scaling.dat', timings )
+    os.makedirs("results", exist_ok = True)
 
-        if not os.path.exists( 'results/vptree-scaling.dat' ):
-            timings = benchmark_vptree( np.unique( ( 10 ** np.linspace( 0, 5, 40 ) ).astype( np.int ) ) )
-            np.savetxt( 'results/vptree-scaling.dat', timings )
-
-        if not os.path.exists( 'results/cppbktree-scaling.dat' ):
-            timings = benchmark_cppbktree( np.unique( ( 10 ** np.linspace( 0, 5, 40 ) ).astype( np.int ) ) )
-            np.savetxt( 'results/cppbktree-scaling.dat', timings )
+    MAX_MAGNITUDE = 7
+    element_sizes = np.unique( ( 10 ** np.linspace( 0, MAX_MAGNITUDE, 40 ) ).astype( np.int64 ) )
 
     if False:
-        plot_results( np.genfromtxt( 'results/pybktree-scaling.dat' ), export_name = 'results/pybktree-scaling' )
-        plot_results( np.genfromtxt( 'results/vptree-scaling.dat' ), export_name = 'results/vptree-scaling' )
-        plot_results( np.genfromtxt( 'results/cppbktree-scaling.dat' ), export_name = 'results/cppbktree-scaling' )
+        filePath = f"results/pybktree-scaling-1e{MAX_MAGNITUDE}.dat"
+        if 'pybktree' in sys.modules and not os.path.exists( filePath ):
+            timings = benchmark_pybktree( element_sizes )
+            np.savetxt( filePath, timings )
+        plot_results( np.genfromtxt( filePath ), export_name = filePath.replace( ".dat", "" ) )
+
+        filePath = f"results/vpktree-scaling-1e{MAX_MAGNITUDE}.dat"
+        if 'vptree' in sys.modules and not os.path.exists( filePath ):
+            timings = benchmark_vptree( element_sizes )
+            np.savetxt( filePath, timings )
+        plot_results( np.genfromtxt( filePath ), export_name = filePath.replace( ".dat", "" ) )
+
+        filePath = f"results/cppbktree-scaling-1e{MAX_MAGNITUDE}.dat"
+        if not os.path.exists( filePath ):
+            timings = benchmark_cppbktree( element_sizes )
+            np.savetxt( filePath, timings )
+        plot_results( np.genfromtxt( filePath ), export_name = filePath.replace( ".dat", "" ) )
+
+    if True:
+        filePath = f"results/linear-lookup-scaling-1e{MAX_MAGNITUDE}.dat"
+        if not os.path.exists( filePath ):
+            timings = benchmark_linear_lookup( element_sizes )
+            np.savetxt( filePath, timings )
+        plot_results( np.genfromtxt( filePath ), export_name = filePath.replace( ".dat", "" ) )
 
     #compare_scaling( [ 'results/pybktree-scaling.dat', 'results/cppbktree-scaling.dat' ], 'results/compare-scalings' )
-    compare_scaling( [ 'results/pybktree-scaling-1e7.dat', 'results/cppbktree-scaling-1e7.dat' ],
-                     'results/compare-scalings-pybktree-cppbktree' )
-    compare_scaling( [ 'results/pybktree-scaling-1e5.dat', 'results/vptree-scaling-1e5.dat' ],
-                     'results/compare-scalings-pybktree-vptree' )
+    #compare_scaling( [ 'results/pybktree-scaling-1e7.dat', 'results/cppbktree-scaling-1e7.dat' ],
+    #                 'results/compare-scalings-pybktree-cppbktree' )
+    #compare_scaling( [ 'results/pybktree-scaling-1e5.dat', 'results/vptree-scaling-1e5.dat' ],
+    #                 'results/compare-scalings-pybktree-vptree' )
+    compare_scaling( [
+        f"results/linear-lookup-scaling-1e{MAX_MAGNITUDE}.dat",
+        f"results/cppbktree-scaling-1e{MAX_MAGNITUDE}.dat",
+    ], "results/compare-scalings-cppbktree-linear-lookup" )
 
     plt.show()

@@ -85,6 +85,11 @@ class Build(build_ext):
         for ext in self.extensions:
             ext.extra_compile_args = ['-std=c++17', '-O3', '-DNDEBUG']
 
+            # SSE 4.2 is important for the popcnt instruction to be used for a 3x speedup using the linear lookup.
+            # SSE 4.2 has been available on all x86 processors since 2011.
+            if platform.machine().endswith('64'):
+                ext.extra_compile_args += ['-msse4.2']
+
             # https://github.com/cython/cython/issues/2670#issuecomment-432212671
             # https://github.com/cython/cython/issues/3405#issuecomment-596975159
             # https://bugs.python.org/issue35037

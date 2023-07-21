@@ -1,6 +1,6 @@
 from libc.stdlib cimport malloc, free
 from libc.stdio cimport SEEK_SET
-from libc.stdint cimport uint8_t
+from libc.stdint cimport uint8_t, uint64_t
 from libcpp.map cimport map
 from libcpp.vector cimport vector
 from libcpp.string cimport string
@@ -10,6 +10,40 @@ from libcpp cimport bool
 cdef extern from "Python.h":
     char * PyString_AsString(object)
     object PyString_FromStringAndSize(char*, int)
+
+
+cdef extern from "LinearLookup.hpp":
+    cppclass CppLinearLookup[T_ValueType]:
+        CppLinearLookup(vector[T_ValueType]) except +
+        vector[size_t] find(T_ValueType, unsigned short int) except +
+        size_t size() except +
+
+
+cdef class _LinearLookup64:
+    cdef CppLinearLookup[uint64_t]* data
+
+    def __cinit__(self, list_of_hashes):
+        self.data = new CppLinearLookup[uint64_t](list_of_hashes)
+
+    def __dealloc__(self):
+        del self.data
+
+    def find(self, query, distance=0):
+        return <list>(self.data.find(query, distance))
+
+    def size(self):
+        return self.data.size()
+
+# Extra class because cdefs are not visible from outside
+class LinearLookup64:
+    def __init__(self, list_of_hashes):
+        self.tree = _LinearLookup64(list_of_hashes)
+
+    def find(self, query, distance=0):
+        return self.tree.find(query, distance)
+
+    def size(self):
+        return self.tree.size()
 
 
 cdef extern from "cppbktree.hpp":
@@ -100,5 +134,6 @@ class BKTree:
 
     def serialize(self, file_name):
         return self.tree.serialize(file_name)
+
 
 __version__ = '0.0.1'

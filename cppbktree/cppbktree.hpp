@@ -63,25 +63,11 @@ hammingDistance( const std::vector<uint8_t>& a,
 }
 
 
-template<typename T>
-std::ostream&
-operator<<( std::ostream&         out,
-            const std::vector<T>& values )
+[[maybe_unused]] size_t
+hammingDistance64( const uint64_t a,
+                   const uint64_t b )
 {
-    std::ios ioState( nullptr );
-    ioState.copyfmt( out );
-
-    out << "{";
-    for ( const auto& x : values ) {
-        out << " ";
-
-        //out << std::showbase << std::internal << std::setfill( '0' ) << std::hex << std::setw( 2 );
-        out << static_cast<unsigned int>( x );
-        out.copyfmt( ioState );
-    }
-
-    out << " }";
-    return out;
+    return countBits( a ^ b );
 }
 
 
