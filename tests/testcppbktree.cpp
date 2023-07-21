@@ -845,12 +845,13 @@ benchmarkLinearHammingLookupSimple2( const AlignedVector<uint64_t>& haystack,
 void
 benchmarkTreeHammingLookup64( const AlignedVector<uint64_t>& haystack,
                               const uint64_t                 needle,
-                              const size_t                   distance )
+                              const size_t                   distance,
+                              const size_t                   maxElementCount )
 {
     std::vector<uint64_t> copy( haystack.begin(), haystack.end() );
     const auto t0 = now();
     CppBKTree<uint64_t, size_t> bkTree( hammingDistance64, copy );
-    bkTree.rebalance( 32ULL * 1024ULL );
+    bkTree.rebalance( maxElementCount );
     const auto t1 = now();
     std::cerr << "Creating BK tree from " << haystack.size() << " values took " << duration( t0, t1 ) << " s\n";
 
@@ -892,14 +893,15 @@ toVector( uint64_t value )
 void
 benchmarkTreeHammingLookupVector( const AlignedVector<uint64_t>& haystack,
                                   const uint64_t               needle,
-                                  const size_t                 distance )
+                                  const size_t                 distance,
+                                  const size_t                 maxElementCount )
 {
     std::vector<std::vector<uint8_t> > converted( haystack.size() );
     std::transform( haystack.begin(), haystack.end(), converted.begin(), toVector );
 
     const auto t0 = now();
     BKTree bkTree( hammingDistance, converted );
-    bkTree.rebalance( 32ULL * 1024ULL );
+    bkTree.rebalance( maxElementCount );
     const auto t1 = now();
     std::cerr << "Creating std::vector<uint8_t> BK tree from " << haystack.size()
               << " values took " << duration( t0, t1 ) << " s\n";
@@ -965,13 +967,54 @@ benchmarkHammingLookup( const size_t valueCount,
     //benchmarkLinearHammingLookupOpenMP( hashes, needle, distance );
 
     // Found 6718684 matches out of 10 M consecutive numbers in 0.983876 s for distance 12 (13.1 s tree creation)
-    std::cerr << "\n[benchmarkTreeHammingLookup64]\n";
-    benchmarkTreeHammingLookup64( hashes, needle, distance );
+    for ( const auto maxElementCount : { 16 } ) {
+        std::cerr << "\n[benchmarkTreeHammingLookup64] rebalance( " << maxElementCount << " )\n";
+        benchmarkTreeHammingLookup64( hashes, needle, distance, maxElementCount );
+    }
+    /**
+     * Benchmark with 100 M elements:
+     *
+     * @verbatim
+     * maxElementCount | Distance | Tree creation | Lookup      | Simple Lookup
+     * ----------------+----------+---------------+------------ +--------------
+     *         16      |     0    |  25.9439      | 4.226e-05   |
+     *        256      |     0    |  16.8498      | 3.589e-05   |
+     *       4096      |     0    |  11.4134      | 4.959e-05   |  0.0643504
+     *      32768      |     0    |   9.05111     | 9.119e-05   |
+     *     262144      |     0    |   7.07458     | 0.000205951 |
+     * ----------------+----------+---------------+------------ +--------------
+     *         16      |     2    |  23.5915      | 0.00124722  |
+     *        256      |     2    |  16.8016      | 0.000644331 |
+     *       4096      |     2    |  11.3062      | 0.000803542 |  0.0649045
+     *      32768      |     2    |   9.08644     | 0.00193644  |
+     *     262144      |     2    |   7.06035     | 0.00512268  |
+     * ----------------+----------+---------------+------------ +--------------
+     *         16      |    12    |  22.558       | 1.93299     |
+     *        256      |    12    |  15.2452      | 0.468698    |
+     *       4096      |    12    |  11.0815      | 0.208006    |  0.0654388
+     *      32768      |    12    |   9.09776     | 0.190722    |
+     *     262144      |    12    |   6.98312     | 0.190014    |
+     * @endverbatim
+     *
+     * Observations:
+     *
+     *  - Tree creation becomes cheaper with larger chunk sizes because we don't have to split all that often.
+     *  - Exact lookup is the fastest for the smallest tested chunk size of 256 but even for 32 K it is not that bad,
+     *    i.e. it still is magnitudes faster than simple lookup.
+     *  - maxElementCount == 1 could not be benchmarked because it takes too much memory!
+     *  - Very inexact lookup with distance == 12 does not get faster anymore after 4096 chunk size.
+     *
+     * Conclusion:
+     *
+     *  - When only looking considering lookup times, 4 K would be the ideal chunk size.
+     *  - Considering memory usage and tree creation times, a chunk size of 32 - 256 K is better
+     *    while still being sufficiently faster for exact matching for the not shown maxElementCount == 1.
+     */
 
     // Found 6718684 matches out of 10 M consecutive numbers in 1.0508 s for distance 12 (14.6 s tree creation)
     // Found 3 matches out of 10 M random numbers in 1.32147 s for distance 12 (14.6 s tree creation)
-    std::cerr << "\n[benchmarkTreeHammingLookupVector]\n";
-    benchmarkTreeHammingLookupVector( hashes, needle, distance );
+    //std::cerr << "\n[benchmarkTreeHammingLookupVector]\n";
+    //benchmarkTreeHammingLookupVector( hashes, needle, distance );
 }
 
 
@@ -1010,8 +1053,9 @@ benchmarkCppBkTreeHammingLookup()
 int main()
 {
     testCountDifferingBits8();
-    benchmarkHammingLookup( 10'000'000, 0 );
-    benchmarkHammingLookup( 10'000'000, 12 );
+    benchmarkHammingLookup( 100'000'000, 0 );
+    benchmarkHammingLookup( 100'000'000, 2 );
+    benchmarkHammingLookup( 100'000'000, 12 );
 
     checkCountBits();
     checkHammingDistance();

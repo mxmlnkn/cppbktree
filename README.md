@@ -41,7 +41,27 @@ Pull requests are welcome.
 The benchmark consists of inserting a varying amount of random 64-bit elements into the tree and then querying a value at varying distances.
 This is done five times to get a hint for the standard deviation as is plotted with error bars.
 
-## Comparison pybktree vs. cppbktree
+## Comparison pybktree vs. cppbktree 0.1.0 with 32 K element chunking for 64-bit elements
+
+![Comparison pybktree cppbktree chunked](benchmark/results/compare-scalings-pybktree-cppbktree-chunked-8K.png) 
+
+This is a benchmark for the specialized `BKTree64`, which operates on 64-bit values.
+Doing the same with `BKTree` and byte vectors of size 8 to represent 64-bit values is roughly 4x slower
+because of additional allocations and because of pointer-chasing slowing down the linear lookup.
+A more intricate version could simply concatenate the element vectors into one consecutive memory chunk to avoid these performance issues.
+
+| Operation | pybktree / s | cppbktree (8K chunks) / s | Speedup |
+|-----------------------|:--------:|:--------:|:----:|
+| Tree creation time    | 88.53    | 1.57     | 56
+| Distance threshold 0  | 2.42e-04 | 1.81e-05 | 13
+| Distance threshold 1  | 7.49e-04 | 1.11e-04 | 6.7
+| Distance threshold 2  | 8.55e-03 | 4.46e-04 | 19
+| Distance threshold 4  | 2.21e-01 | 3.35e-03 | 66
+| Distance threshold 8  | 4.22e+00 | 1.55e-02 | 272
+| Distance threshold 16 | 1.15e+01 | 3.00e-02 | 383
+
+
+## Scaling Analysis
 
 ![Comparison pybktree cppbktree](benchmark/results/compare-scalings-pybktree-cppbktree.png)
 

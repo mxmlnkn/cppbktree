@@ -307,6 +307,16 @@ public:
             std::iota( payloads.begin(), payloads.end(), 0 );
             m_root = std::unique_ptr<Node>( new Node{ {}, std::move( values ), std::move( payloads ), {} } );
         }
+
+        if ( !m_metricFunction ) {
+            if constexpr ( std::is_same_v<ValueType, uint64_t> ) {
+                m_metricFunction = MetricFunction( &hammingDistance64 );
+            } else if constexpr ( std::is_same_v<ValueType, std::vector<uint8_t> > ) {
+                m_metricFunction = MetricFunction( &hammingDistance );
+            } else {
+                throw std::invalid_argument( "Could not find a suitable default metric function. Please specify one!" );
+            }
+        }
     }
 
     explicit
@@ -450,5 +460,5 @@ public:
 private:
     std::unique_ptr<Node> m_root;
     size_t m_itemCount = 0;
-    const MetricFunction m_metricFunction;
+    MetricFunction m_metricFunction;
 };

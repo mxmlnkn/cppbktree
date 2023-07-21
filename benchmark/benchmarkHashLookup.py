@@ -6,6 +6,7 @@ import pprint
 import sys
 import time
 
+import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 import numpy as np
@@ -24,7 +25,7 @@ except ImportError:
     pass
 
 
-def benchmark_linear_lookup( element_counts, repeat_count = 10 ):
+def benchmark_64_bit_hashes( element_counts, class_to_use, repeat_count = 10 ):
     """
     Returns a list of triples:
       - elements
@@ -39,7 +40,7 @@ def benchmark_linear_lookup( element_counts, repeat_count = 10 ):
         for distance in [ 0, 1, 2, 4, 8, 16 ]:
             elements = np.random.randint( np.iinfo( np.uint64 ).max, size = element_count, dtype = np.uint64 )
 
-            cpptree = cppbktree.LinearLookup64( elements )
+            cpptree = class_to_use( elements )
             cppresults = sorted( elements[cpptree.find( 0, distance )] )
             print( "CppResults:", cppresults )
 
@@ -57,7 +58,7 @@ def benchmark_linear_lookup( element_counts, repeat_count = 10 ):
             # because it's trouble to specify arbitrary objects and metrics through the Cython interface.
             elements = np.random.randint( np.iinfo( np.uint64 ).max, size = element_count, dtype = np.uint64 )
             t0 = time.time()
-            database = cppbktree.LinearLookup64( elements )
+            database = class_to_use( elements )
             t1 = time.time()
             runtimes.append( t1 - t0 )
         timing += [ np.mean( runtimes ), np.std( runtimes ) ]
@@ -66,7 +67,7 @@ def benchmark_linear_lookup( element_counts, repeat_count = 10 ):
             runtimes = []
             for i in range( repeat_count ):
                 elements = np.random.randint( np.iinfo( np.uint64 ).max, size = element_count, dtype = np.uint64 )
-                database = cppbktree.LinearLookup64( elements )
+                database = class_to_use( elements )
                 t0 = time.time()
                 results = database.find( 0, distance )
                 t1 = time.time()
@@ -308,6 +309,10 @@ def compare_scaling( data_files, export_name = None, print_numerical_comparison 
     for data_file, linestyle in zip( data_files, linestyles ):
         legend_lines.append( Line2D( [ 0 ], [ 0 ], color = '0.5', linestyle = linestyle, label = data_file.split( '/' )[-1] ) )
 
+    ax.yaxis.set_major_locator( matplotlib.ticker.LogLocator( numticks = 20 ) )
+    ax.yaxis.set_minor_locator( matplotlib.ticker.LogLocator( subs = 'all', numticks = 30 ) )
+
+    #ax.grid()
     ax.legend( handles = legend_lines, loc = 'best' )
 
     fig.tight_layout()
@@ -315,6 +320,7 @@ def compare_scaling( data_files, export_name = None, print_numerical_comparison 
     if export_name:
         fig.savefig( export_name + '.pdf' )
         fig.savefig( export_name + '.png' )
+        print( f"Save image to: {export_name}.png" )
 
     if print_numerical_comparison and len( data_files ) == 2:
         # Give out some textual speedups for 1e7 elements
@@ -332,6 +338,7 @@ if __name__ == '__main__':
     os.makedirs("results", exist_ok = True)
 
     MAX_MAGNITUDE = 7
+    CHUNK_SIZE_IN_KILO_BINARY = 8
     element_sizes = np.unique( ( 10 ** np.linspace( 0, MAX_MAGNITUDE, 40 ) ).astype( np.int64 ) )
 
     if False:
@@ -353,21 +360,38 @@ if __name__ == '__main__':
             np.savetxt( filePath, timings )
         plot_results( np.genfromtxt( filePath ), export_name = filePath.replace( ".dat", "" ) )
 
-    if True:
         filePath = f"results/linear-lookup-scaling-1e{MAX_MAGNITUDE}.dat"
         if not os.path.exists( filePath ):
-            timings = benchmark_linear_lookup( element_sizes )
+            timings = benchmark_64_bit_hashes( element_sizes, cppbktree.LinearLookup64 )
             np.savetxt( filePath, timings )
         plot_results( np.genfromtxt( filePath ), export_name = filePath.replace( ".dat", "" ) )
 
-    #compare_scaling( [ 'results/pybktree-scaling.dat', 'results/cppbktree-scaling.dat' ], 'results/compare-scalings' )
-    #compare_scaling( [ 'results/pybktree-scaling-1e7.dat', 'results/cppbktree-scaling-1e7.dat' ],
-    #                 'results/compare-scalings-pybktree-cppbktree' )
+        filePath = f"results/cppbktree-chunked-{CHUNK_SIZE_IN_KILO_BINARY}K-scaling-1e{MAX_MAGNITUDE}.dat"
+        if not os.path.exists( filePath ):
+            timings = benchmark_64_bit_hashes( element_sizes,
+                                               lambda x: cppbktree.BKTree64( x, CHUNK_SIZE_IN_KILO_BINARY * 1024 ) )
+            np.savetxt( filePath, timings )
+        plot_results( np.genfromtxt( filePath ), export_name = filePath.replace( ".dat", "" ) )
+
+    #compare_scaling( [
+    #    'results/pybktree-scaling-1e7.dat',
+    #    'results/cppbktree-scaling-1e7.dat'
+    #], 'results/compare-scalings-pybktree-cppbktree' )
     #compare_scaling( [ 'results/pybktree-scaling-1e5.dat', 'results/vptree-scaling-1e5.dat' ],
     #                 'results/compare-scalings-pybktree-vptree' )
+    #compare_scaling( [
+    #    f"results/linear-lookup-scaling-1e{MAX_MAGNITUDE}.dat",
+    #    f"results/cppbktree-scaling-1e{MAX_MAGNITUDE}.dat",
+    #], "results/compare-scalings-cppbktree-linear-lookup" )
+
     compare_scaling( [
-        f"results/linear-lookup-scaling-1e{MAX_MAGNITUDE}.dat",
         f"results/cppbktree-scaling-1e{MAX_MAGNITUDE}.dat",
-    ], "results/compare-scalings-cppbktree-linear-lookup" )
+        f"results/cppbktree-chunked-{CHUNK_SIZE_IN_KILO_BINARY}K-scaling-1e{MAX_MAGNITUDE}.dat",
+    ], f"results/compare-scalings-cppbktree-vs-chunked-{CHUNK_SIZE_IN_KILO_BINARY}K" )
+
+    compare_scaling( [
+        f"results/pybktree-scaling-1e{MAX_MAGNITUDE}.dat",
+        f"results/cppbktree-chunked-{CHUNK_SIZE_IN_KILO_BINARY}K-scaling-1e{MAX_MAGNITUDE}.dat",
+    ], f"results/compare-scalings-pybktree-cppbktree-chunked-{CHUNK_SIZE_IN_KILO_BINARY}K" )
 
     plt.show()

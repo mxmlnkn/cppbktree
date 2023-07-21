@@ -120,15 +120,15 @@ cdef class _BKTree:
 cdef class _BKTree64:
     cdef CppBKTree[uint64_t, size_t]* tree
 
-    def __cinit__(self, list_of_hashes_or_file_name):
+    def __cinit__(self, list_of_hashes_or_file_name, max_element_count = 32 * 1024):
         self.tree = new CppBKTree[uint64_t, size_t](list_of_hashes_or_file_name)
-        self.tree.rebalance( 32 * 1024 );
+        self.tree.rebalance(max_element_count);
 
     def __dealloc__(self):
         del self.tree
 
     def find(self, query, distance=0):
-        return <list>(self.tree.find(<uint64_t>query, distance))
+        return <list>(self.tree.find(query, distance))
 
     def size(self):
         return self.tree.size()
@@ -174,8 +174,8 @@ class BKTree:
 
 
 class BKTree64:
-    def __init__(self, list_of_hashes):
-        self.tree = _BKTree64(list_of_hashes)
+    def __init__(self, list_of_hashes, max_element_count = 32 * 1024):
+        self.tree = _BKTree64(list_of_hashes, max_element_count)
 
     def find(self, query, distance=0):
         return self.tree.find(query, distance)
