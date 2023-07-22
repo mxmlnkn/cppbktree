@@ -543,8 +543,158 @@ benchmarkHammingLookup( const size_t valueCount,
 }
 
 
+void
+benchmarkLinearHammingLookupSimpleBatch( const AlignedVector<uint64_t>& haystack,
+                                         const std::vector<uint64_t>&   needles,
+                                         const size_t                   distance )
+{
+    const auto t0 = now();
+    std::vector<std::vector<size_t> > positions( needles.size() );
+    for ( size_t i = 0; i < haystack.size(); ++i ) {
+        for ( size_t j = 0; j < needles.size(); ++j ) {
+            if ( std::bitset<64>( haystack[i] ^ needles[j] ).count() <= distance ) {
+                positions[j].push_back( i );
+            }
+        }
+    }
+    const auto t1 = now();
+
+    const auto totalMatches = std::accumulate( positions.begin(), positions.end(), uint64_t( 0 ),
+                                               [] ( const uint64_t sum, const auto& v ) { return sum + v.size(); } );
+    std::cerr << "Found " << totalMatches << " positions out of " << haystack.size()
+              << " in " << duration( t0, t1 ) << " for " << needles.size()
+              << " needles matching a distance " << distance << "\n";
+}
+
+
+void
+benchmarkLinearHammingLookupSimpleBatch2( const AlignedVector<uint64_t>& haystack,
+                                          const std::vector<uint64_t>&   needles,
+                                          const size_t                   distance )
+{
+    const auto t0 = now();
+    std::vector<std::vector<size_t> > positions( needles.size() );
+    static constexpr size_t CHUNK_SIZE = 1024;
+    for ( size_t k = 0; k < haystack.size(); k += CHUNK_SIZE ) {
+        const auto maximum = std::min( haystack.size(), k + CHUNK_SIZE );
+        for ( size_t j = 0; j < needles.size(); ++j ) {
+            for ( size_t i = k; i < maximum; ++i ) {
+                if ( std::bitset<64>( haystack[i] ^ needles[j] ).count() <= distance ) {
+                    positions[j].push_back( i );
+                }
+            }
+        }
+    }
+    const auto t1 = now();
+
+    const auto totalMatches = std::accumulate( positions.begin(), positions.end(), uint64_t( 0 ),
+                                               [] ( const uint64_t sum, const auto& v ) { return sum + v.size(); } );
+    std::cerr << "Found " << totalMatches << " positions out of " << haystack.size()
+              << " in " << duration( t0, t1 ) << " for " << needles.size()
+              << " needles matching a distance " << distance << "\n";
+}
+
+
+#ifdef __AVX2__
+void
+benchmarkLinearHammingLookupSIMDBatch( const AlignedVector<uint64_t>& haystack,
+                                       const std::vector<uint64_t>&   needles,
+                                       const size_t                   distance )
+{
+    const auto t0 = now();
+
+    std::vector<std::vector<size_t> > positions( needles.size() );
+
+    /* Add 1 to distance because there is only == or > for 16-bit integer AVX2 instructinos. */
+    const auto distanceRepeated = _mm256_set1_epi64x( distance == std::numeric_limits<uint8_t>::max()
+                                                      ? distance : distance + 1 );
+
+    /* Duplicate 128-bit LUT to 256-bit so that it works with the peculiar 256-bit shuffle version. */
+    const auto bitCountLUT128 =
+        _mm_load_si128( reinterpret_cast<const __m128i*>( BIT_COUNT_LUT.data() ) );  // 128 b = 16 B LUT size
+    const auto bitCountLUT = _mm256_set_m128i( bitCountLUT128, bitCountLUT128 );
+
+    const auto LOW_NIBBLES_SET = _mm256_set1_epi8( 0x0F );
+    const auto LOW_BYTES_SET = _mm256_set1_epi16( 0xFF );
+
+    static constexpr size_t SIMD_ELEMENTS = sizeof( __m256i ) / sizeof( haystack[0] );  // 32 B and 4 x 64-bit values!
+    for ( size_t i = 0; i + SIMD_ELEMENTS - 1 < haystack.size(); i += SIMD_ELEMENTS ) {
+        const auto values = _mm256_load_si256( reinterpret_cast<const __m256i*>( haystack.data() + i ) );
+
+        for ( size_t iNeedle = 0; iNeedle < needles.size(); ++iNeedle ) {
+            const auto needleRepeated = _mm256_set1_epi64x( needles[iNeedle] );
+
+            const auto tested = values ^ needleRepeated;
+            const auto bitCounts8 = _mm256_shuffle_epi8( bitCountLUT, tested & LOW_NIBBLES_SET ) +
+                                    _mm256_shuffle_epi8( bitCountLUT, ( tested >> 4U ) & LOW_NIBBLES_SET );
+
+            const auto bitCounts16 = ( bitCounts8  & LOW_BYTES_SET ) + _mm256_srli_epi64( bitCounts8 ,  8U );
+            const auto bitCounts32 = ( bitCounts16 & LOW_BYTES_SET ) + _mm256_srli_epi64( bitCounts16, 16U );
+            const auto bitCounts64 = ( bitCounts32 & LOW_BYTES_SET ) + _mm256_srli_epi64( bitCounts32, 32U );
+
+            /* Move bytes with counts for consecutive bits to the least significant positions and cast down. */
+            auto result = static_cast<uint32_t>(
+                _mm256_movemask_epi8( _mm256_cmpgt_epi16( distanceRepeated, bitCounts64 ) ) );
+            for ( size_t k = 0; result != 0; result >>= sizeof( needles[0] ), ++k ) {
+                if ( ( result & 1U ) > 0 ) {
+                    positions[iNeedle].push_back( i + k );
+                }
+            }
+        }
+    }
+
+    const auto t1 = now();
+    const auto totalMatches = std::accumulate( positions.begin(), positions.end(), uint64_t( 0 ),
+                                               [] ( const uint64_t sum, const auto& v ) { return sum + v.size(); } );
+    std::cerr << "Found " << totalMatches << " positions out of " << haystack.size()
+              << " in " << duration( t0, t1 ) << " matching a distance " << distance << "\n";
+}
+#endif  // ifdef __AVX2__
+
+
+void
+benchmarkBatchHammingLookup( const size_t valueCount,
+                             const size_t distance )
+{
+    std::cerr << "\n == Benchmarking for distance " << distance << " ==\n";
+
+    const auto t0 = now();
+
+    std::random_device randomDevice;
+    std::default_random_engine randomEngine( 0 );
+    std::uniform_int_distribution<uint64_t> distribution( 0 );
+
+    AlignedVector<uint64_t> hashes( valueCount );
+    for ( auto& h : hashes ) {
+        h = distribution( randomEngine );
+    }
+
+    const auto t1 = now();
+    std::cerr << "Generating random numbers took " << duration( t0, t1 ) << " s\n";
+
+    const std::vector<uint64_t> needles = {
+        hashes[333], hashes[334], hashes[335], hashes[336],
+        hashes[1333], hashes[1334], hashes[1335], hashes[1336],
+        hashes[21333], hashes[21334], hashes[21335], hashes[21336],
+        hashes[421333], hashes[421334], hashes[421335], hashes[421336],
+    };
+
+    std::cerr << "[benchmarkLinearHammingLookupSimpleBatch] ";
+    benchmarkLinearHammingLookupSimpleBatch( hashes, needles, distance );
+    std::cerr << "[benchmarkLinearHammingLookupSimpleBatch2] ";
+    benchmarkLinearHammingLookupSimpleBatch2( hashes, needles, distance );
+
+    std::cerr << "[benchmarkLinearHammingLookupSIMDBatch] ";
+    benchmarkLinearHammingLookupSIMDBatch( hashes, needles, distance );
+}
+
+
 int main()
 {
+    benchmarkBatchHammingLookup( 100'000'000, 0 );
+    benchmarkBatchHammingLookup( 100'000'000, 2 );
+    benchmarkBatchHammingLookup( 100'000'000, 12 );
+
     benchmarkHammingLookup( 100'000'000, 0 );
     benchmarkHammingLookup( 100'000'000, 2 );
     benchmarkHammingLookup( 100'000'000, 12 );
