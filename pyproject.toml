@@ -3,5 +3,42 @@
 [build-system]
 # Use setuptools >= 43 because it automatically includes pyproject.toml in source distribution
 # Use setuptools >= 46.5 to use attr: package.__version__
+# Use setuptools >= 61 for pyproject.toml support
 # https://setuptools.readthedocs.io/en/latest/history.html#id284
-requires = ["setuptools >= 46.4.0", "wheel", "cython >= 0.29.24"]
+requires = ["setuptools >= 61.2", "wheel", "cython >= 0.29.24"]
+
+[project]
+name = "cppbktree"
+version = "0.1.0"
+description = "C++ Implementation of a Burkhard-Keller Tree (BK-Tree)"
+authors = [{name = "Maximilian Knespel", email = "mxmlnknp@gmail.com"}]
+license = {text = "MIT"}
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Development Status :: 3 - Alpha",
+    "Natural Language :: English",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX",
+    "Operating System :: Unix",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: C++",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+urls = {Homepage = "https://github.com/mxmlnkn/cppbktree"}
+requires-python = ">= 3.6"
+
+[project.readme]
+file = "README.md"
+content-type = "text/markdown"
+
+[tool.setuptools]
+py-modules = ["cppbktree"]
+license-files = ["LICENSE"]
