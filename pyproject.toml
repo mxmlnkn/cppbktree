@@ -4,8 +4,14 @@
 # Use setuptools >= 43 because it automatically includes pyproject.toml in source distribution
 # Use setuptools >= 46.5 to use attr: package.__version__
 # Use setuptools >= 61 for pyproject.toml support
+# Use setuptools < 72 because of this: https://github.com/pypa/distutils/issues/283
 # https://setuptools.readthedocs.io/en/latest/history.html#id284
-requires = ["setuptools >= 61.2", "wheel", "cython >= 0.29.24"]
+requires = [
+    "cython >= 0.29.24",
+    "setuptools >= 61.2",
+    "setuptools < 72; platform.python_implementation == 'PyPy'",
+    "wheel",
+]
 
 [project]
 name = "cppbktree"
