@@ -39,7 +39,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 urls = {Homepage = "https://github.com/mxmlnkn/cppbktree"}
-requires-python = ">= 3.6"
+requires-python = ">= 3.7"
 
 [project.readme]
 file = "README.md"
