@@ -1,4 +1,8 @@
 
+# Version 0.2.0 built on 2024-11-23
+
+ - Add `add` method to Python interface.
+
 # Version 0.1.0 built on 2023-07-21
 
  - Chunk up to 8K (configurable) elements making the lookup a mix of BK tree traversal and linear

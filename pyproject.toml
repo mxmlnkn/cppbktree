@@ -9,7 +9,7 @@ requires = ["setuptools >= 61.2", "wheel", "cython >= 0.29.24"]
 
 [project]
 name = "cppbktree"
-version = "0.1.0"
+version = "0.2.0"
 description = "C++ Implementation of a Burkhard-Keller Tree (BK-Tree)"
 authors = [{name = "Maximilian Knespel", email = "mxmlnknp@gmail.com"}]
 license = {text = "MIT"}
