@@ -138,14 +138,14 @@ public:
         {
             /* Would be good to have a maximum possible hamming distance safely derived
              * from ValueType and MetricFunction. But even if we had that, the ideal chunk size also depends
-             * on the benchmarks, which are dependant on both. Not possibly to do it generically autlomatically.
-             * Simply assume std::vecto<uint8_t> with 8 values (effectively uint64_t) for now.
-             * One problem here is that a single node split on average would lead to maximum distance more nodes.
+             * on the benchmarks, which are dependant on both. Not possibly to do it generically automatically.
+             * Simply assume std::vector<uint8_t> with 8 values (effectively uint64_t) for now.
+             * One problem here is that a single node split, on average, would lead to "maximum distance" more nodes.
              * For uint64_t, this means almost two magnitudes more nodes for a single split.
-             * This makes the tradeoff consideration for splitting vs not splitting difficult.
+             * This makes the trade-off consideration for splitting vs. not splitting difficult.
              * For large distance lookups (distance > maximum distance / 4), splitting is not necessary at all.
              * This means, we are doing this to optimize small distances such as distance = 0.
-             * For distance = 0, we need to find splitting makes almost always sense, except if a linear lookup
+             * For distance = 0, we find splitting almost always making sense, except if a linear lookup
              * is not reduced any further, which is the case for element counts < 1k.
              * However, splitting for more than 1k would result in sub nodes with each only ~16 elements!
              * This would impede lookup for large distances!
@@ -331,6 +331,14 @@ public:
             m_root->add( std::move( value ), m_itemCount++, m_metricFunction );
         } else {
             m_root = std::unique_ptr<Node>( new Node{ {}, { value }, { m_itemCount++ }, /* children */ {} } );
+        }
+    }
+
+    void
+    add( const std::vector<ValueType>& values )
+    {
+        for ( const auto& value : values ) {
+            add( value );
         }
     }
 
