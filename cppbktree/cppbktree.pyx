@@ -82,6 +82,8 @@ cdef extern from "cppbktree.hpp":
 
 cdef class _BKTree:
     cdef CppBKTree[vector[uint8_t], size_t]* tree
+    cdef int max_element_count
+    cdef bool _needs_rebalance
 
     def __cinit__(self, list_of_hashes_or_file_name, max_element_count = 32 * 1024):
         self.tree = new CppBKTree[vector[uint8_t], size_t](<vector[vector[uint8_t]]>list_of_hashes_or_file_name)
@@ -129,6 +131,8 @@ cdef class _BKTree:
 
 cdef class _BKTree64:
     cdef CppBKTree[uint64_t, size_t]* tree
+    cdef int max_element_count
+    cdef bool _needs_rebalance
 
     def __cinit__(self, list_of_hashes_or_file_name, max_element_count = 32 * 1024):
         self.tree = new CppBKTree[uint64_t, size_t](list_of_hashes_or_file_name)
@@ -170,8 +174,8 @@ cdef class _BKTree64:
         }
         return stats
 
-    def rebalance(self, max_element_count):
-        return self.tree.rebalance(<size_t>max_element_count)
+    def rebalance(self, max_element_count = None):
+        return self.tree.rebalance(self.max_element_count if max_element_count is None else <size_t>max_element_count)
 
 
 # Extra class because cdefs are not visible from outside
@@ -191,7 +195,7 @@ class BKTree:
     def statistics(self):
         return self.tree.statistics()
 
-    def rebalance(self, max_element_count):
+    def rebalance(self, max_element_count = None):
         return self.tree.rebalance(max_element_count)
 
 
@@ -211,7 +215,7 @@ class BKTree64:
     def statistics(self):
         return self.tree.statistics()
 
-    def rebalance(self, max_element_count):
+    def rebalance(self, max_element_count = None):
         return self.tree.rebalance(max_element_count)
 
 
