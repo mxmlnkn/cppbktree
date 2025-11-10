@@ -174,8 +174,8 @@ cdef class _BKTree64:
         }
         return stats
 
-    def rebalance(self, max_element_count):
-        return self.tree.rebalance(<size_t>max_element_count)
+    def rebalance(self, max_element_count = None):
+        return self.tree.rebalance(self.max_element_count if max_element_count is None else <size_t>max_element_count)
 
 
 # Extra class because cdefs are not visible from outside
@@ -195,7 +195,7 @@ class BKTree:
     def statistics(self):
         return self.tree.statistics()
 
-    def rebalance(self, max_element_count):
+    def rebalance(self, max_element_count = None):
         return self.tree.rebalance(max_element_count)
 
 
@@ -215,7 +215,7 @@ class BKTree64:
     def statistics(self):
         return self.tree.statistics()
 
-    def rebalance(self, max_element_count):
+    def rebalance(self, max_element_count = None):
         return self.tree.rebalance(max_element_count)
 
 
