@@ -180,8 +180,8 @@ cdef class _BKTree64:
 
 # Extra class because cdefs are not visible from outside
 class BKTree:
-    def __init__(self, list_of_hashes):
-        self.tree = _BKTree(list_of_hashes)
+    def __init__(self, list_of_hashes, max_element_count = 32 * 1024):
+        self.tree = _BKTree(list_of_hashes, max_element_count)
 
     def add(self, list_of_hashes_or_file_name):
         self.tree.add(list_of_hashes_or_file_name)
