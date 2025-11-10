@@ -82,6 +82,8 @@ cdef extern from "cppbktree.hpp":
 
 cdef class _BKTree:
     cdef CppBKTree[vector[uint8_t], size_t]* tree
+    cdef int max_element_count
+    cdef bool _needs_rebalance
 
     def __cinit__(self, list_of_hashes_or_file_name, max_element_count = 32 * 1024):
         self.tree = new CppBKTree[vector[uint8_t], size_t](<vector[vector[uint8_t]]>list_of_hashes_or_file_name)
@@ -129,6 +131,8 @@ cdef class _BKTree:
 
 cdef class _BKTree64:
     cdef CppBKTree[uint64_t, size_t]* tree
+    cdef int max_element_count
+    cdef bool _needs_rebalance
 
     def __cinit__(self, list_of_hashes_or_file_name, max_element_count = 32 * 1024):
         self.tree = new CppBKTree[uint64_t, size_t](list_of_hashes_or_file_name)
