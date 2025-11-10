@@ -70,6 +70,14 @@ hammingDistance64( const uint64_t a,
 }
 
 
+inline size_t
+hammingDistance64s( const int64_t a,
+                    const int64_t b )
+{
+    return countBits( a ^ b );
+}
+
+
 template<typename T_ValueType,
          typename T_DistanceType>
 class CppBKTree
@@ -311,6 +319,8 @@ public:
         if ( !m_metricFunction ) {
             if constexpr ( std::is_same_v<ValueType, uint64_t> ) {
                 m_metricFunction = MetricFunction( &hammingDistance64 );
+            } else if constexpr ( std::is_same_v<ValueType, int64_t> ) {
+                m_metricFunction = MetricFunction( &hammingDistance64s );
             } else if constexpr ( std::is_same_v<ValueType, std::vector<uint8_t> > ) {
                 m_metricFunction = MetricFunction( &hammingDistance );
             } else {
