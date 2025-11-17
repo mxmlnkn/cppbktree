@@ -3,7 +3,7 @@
 [![PyPI version](https://badge.fury.io/py/cppbktree.svg)](https://badge.fury.io/py/cppbktree)
 [![Downloads](https://pepy.tech/badge/cppbktree/month)](https://pepy.tech/project/cppbktree/month)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](http://opensource.org/licenses/MIT)
-[![Build Status](https://travis-ci.org/mxmlnkn/cppbktree.svg?branch=master)](https://travis-ci.com/mxmlnkn/cppbktree)
+[![C++ Code Checks](https://github.com/mxmlnkn/cppbktree/actions/workflows/test-cpp.yml/badge.svg)](https://github.com/mxmlnkn/cppbktree/actions/workflows/test-cpp.yml)
 
 This module provides a BK-Tree class written in C++ to hopefully better speed than pure-python solutions.
 
