@@ -43,7 +43,7 @@ This is done five times to get a hint for the standard deviation as is plotted w
 
 ## Comparison pybktree vs. cppbktree 0.1.0 with 32 K element chunking for 64-bit elements
 
-![Comparison pybktree cppbktree chunked](benchmark/results/compare-scalings-pybktree-cppbktree-chunked-8K.png) 
+![Comparison pybktree cppbktree chunked](https://github.com/mxmlnkn/cppbktree/blob/master/benchmark/results/compare-scalings-pybktree-cppbktree-chunked-8K.png) 
 
 This is a benchmark for the specialized `BKTree64`, which operates on 64-bit values.
 Doing the same with `BKTree` and byte vectors of size 8 to represent 64-bit values is roughly 4x slower
@@ -63,7 +63,7 @@ A more intricate version could simply concatenate the element vectors into one c
 
 ## Scaling Analysis
 
-![Comparison pybktree cppbktree](benchmark/results/compare-scalings-pybktree-cppbktree.png)
+![Comparison pybktree cppbktree](https://github.com/mxmlnkn/cppbktree/blob/master/benchmark/results/compare-scalings-pybktree-cppbktree.png)
 
 In this log-log plot, it can be seen that the lookups and creations follow various sublinear power laws.
 Inserting one element in a tree of depth $d$ should roughly take `O(log(d))` hamming distance evaluations.
@@ -113,7 +113,7 @@ Only the tree creation time speedup is quite independent of the tree size at rou
 ## Comparison pybktree vs. vptree
 
 
-![Comparison pybktree cppbktree](benchmark/results/compare-scalings-pybktree-vptree.png)
+![Comparison pybktree cppbktree](https://github.com/mxmlnkn/cppbktree/blob/master/benchmark/results/compare-scalings-pybktree-vptree.png)
 
 At least in this benchmark with only 64-bit hashes and a hamming distance as metric and at least with this pure python implementation of a VP-Tree, the results are quite disappointing.
 The vptree module is almost always slower.
@@ -123,7 +123,7 @@ For the 100k elements, this results in pybktree being 7.7 times faster than vptr
 
 ## Comparison linear lookup vs. cppbktree
 
-![Comparison pybktree cppbktree](benchmark/results/compare-scalings-cppbktree-linear-lookup.png)
+![Comparison pybktree cppbktree](https://github.com/mxmlnkn/cppbktree/blob/master/benchmark/results/compare-scalings-cppbktree-linear-lookup.png)
 
 This log-log comparison plot shows that a simple linear lookup can compete with a BK tree.
 For exact and almost exact lookups, the BK tree can become faster but even for a distance of 2,
