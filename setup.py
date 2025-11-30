@@ -2,12 +2,14 @@
 # -*- coding: utf-8 -*-
 
 import platform
+import sysconfig
 import tempfile
 from distutils.errors import CompileError
 
 from setuptools import setup
 from setuptools.extension import Extension
 from setuptools.command.build_ext import build_ext
+from wheel.bdist_wheel import bdist_wheel
 
 # This fallback is only for jinja, which is used by conda to analyze this setup.py before any build environment
 # is set up.
@@ -17,6 +19,16 @@ except ImportError:
     cythonize = None
 
 
+withGIL = not sysconfig.get_config_var("Py_GIL_DISABLED")
+
+class bdist_wheel_abi3(bdist_wheel):
+    def get_tag(self):
+        python, abi, plat = super().get_tag()
+        if withGIL and python.startswith("cp"):
+            # On CPython, our wheels are abi3 and compatible back to 3.8.
+            return "cp38", "abi3", plat
+        return python, abi, plat
+
 extensions = [
     Extension(
         # fmt: off
@@ -24,6 +36,10 @@ extensions = [
         sources            = ['cppbktree/cppbktree.pyx'],
         include_dirs       = ['.'],
         language           = 'c++',
+        # https://docs.python.org/3/c-api/stable.html#c.Py_LIMITED_API
+        # https://docs.python.org/3/c-api/apiabiversion.html#c.Py_Version
+        define_macros=[("Py_LIMITED_API", "0x030800f0")] if withGIL else [],
+        py_limited_api=withGIL,
         # fmt: on
     ),
 ]
@@ -87,7 +103,7 @@ class Build(build_ext):
 
             # SSE 4.2 is important for the popcnt instruction to be used for a 3x speedup using the linear lookup.
             # SSE 4.2 has been available on all x86 processors since 2011.
-            if platform.machine().endswith('64'):
+            if supportsFlag(self.compiler, '-msse4.2'):
                 ext.extra_compile_args += ['-msse4.2']
 
             # https://github.com/cython/cython/issues/2670#issuecomment-432212671
@@ -119,6 +135,6 @@ class Build(build_ext):
 setup(
     # fmt: off
     ext_modules = extensions,
-    cmdclass    = {'build_ext': Build},
+    cmdclass    = {'build_ext': Build, "bdist_wheel": bdist_wheel_abi3},
     # fmt: on
 )

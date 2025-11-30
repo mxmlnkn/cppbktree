@@ -138,7 +138,7 @@ public:
         {
             /* Would be good to have a maximum possible hamming distance safely derived
              * from ValueType and MetricFunction. But even if we had that, the ideal chunk size also depends
-             * on the benchmarks, which are dependant on both. Not possibly to do it generically automatically.
+             * on the benchmarks, which are dependent on both. Not possibly to do it generically automatically.
              * Simply assume std::vector<uint8_t> with 8 values (effectively uint64_t) for now.
              * One problem here is that a single node split, on average, would lead to "maximum distance" more nodes.
              * For uint64_t, this means almost two magnitudes more nodes for a single split.
