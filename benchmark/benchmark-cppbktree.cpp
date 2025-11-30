@@ -684,8 +684,10 @@ benchmarkBatchHammingLookup( const size_t valueCount,
     std::cerr << "[benchmarkLinearHammingLookupSimpleBatch2] ";
     benchmarkLinearHammingLookupSimpleBatch2( hashes, needles, distance );
 
+#ifdef __AVX2__
     std::cerr << "[benchmarkLinearHammingLookupSIMDBatch] ";
     benchmarkLinearHammingLookupSIMDBatch( hashes, needles, distance );
+#endif  // ifdef __AVX2__
 }
 
 
