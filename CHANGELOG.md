@@ -1,7 +1,9 @@
 
-# Version 0.2.0 built on 2024-11-23
+# Version 0.2.0 built on 2025-11-30
 
  - Add `add` method to Python interface.
+ - Add missing `max_element_count` argument to constructor.
+ - Consistently add a default value to `rebalance` `max_element_count` arguments.
 
 # Version 0.1.0 built on 2023-07-21
 
